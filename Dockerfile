@@ -18,7 +18,8 @@ EXPOSE 5998
 WORKDIR /
 COPY --from=build-env /fenixClientServer /
 
-CMD ["/fenixClientServer"]
+#CMD ["/fenixClientServer"]
+ENTRYPOINT ["/fenixClientServer"]
 
 #// docker build -t  fenix-client-server .
 #// docker run -p 5998:5998 -it  fenix-client-server
