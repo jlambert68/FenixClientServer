@@ -2,6 +2,7 @@ package main
 
 import (
 	"FenixClientServer/common_config"
+	echo "github.com/jlambert68/FenixGrpcApi/Client/fenixClientTestDataSyncServerGrpcApi/echo/go_grpc_api"
 	fenixClientTestDataSyncServerGrpcApi "github.com/jlambert68/FenixGrpcApi/Client/fenixClientTestDataSyncServerGrpcApi/go_grpc_api"
 	fenixTestDataSyncServerGrpcApi "github.com/jlambert68/FenixGrpcApi/Fenix/fenixTestDataSyncServerGrpcApi/go_grpc_api"
 	"github.com/sirupsen/logrus"
@@ -9,6 +10,7 @@ import (
 	"net"
 	"strconv"
 	"time"
+	//	ecpb "github.com/jlambert68/FenixGrpcApi/Client/fenixTestDataSyncServerGrpcApi/echo/go_grpc_api"
 )
 
 type fenixClientTestDataSyncServerObject_struct struct {
@@ -57,3 +59,8 @@ var testFile = "../../data/FenixRawTestdata_14rows_211216.csv"
 
 var highestFenixProtoFileVersion int32 = -1
 var highestClientProtoFileVersion int32 = -1
+
+// Echo gRPC-server
+type ecServer struct {
+	echo.UnimplementedEchoServer
+}

@@ -61,8 +61,8 @@ github.com/google/uuid v1.1.2/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+
 github.com/google/uuid v1.3.0 h1:t6JiXgmwXMjEs8VusXIJk2BXHsn+wx8BZdTaoZ5fu7I=
 github.com/google/uuid v1.3.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/grpc-ecosystem/grpc-gateway v1.16.0/go.mod h1:BDjrQk3hbvj6Nolgz8mAMFbcEtjT1g+wF4CSlocrBnw=
-github.com/jlambert68/FenixGrpcApi v0.0.0-20220118154141-2c5cdef4fc50 h1:7+9vd/M/UjgEHBXskYpUh/Wtag25XBbduToUSzGZ1mM=
-github.com/jlambert68/FenixGrpcApi v0.0.0-20220118154141-2c5cdef4fc50/go.mod h1:XXqQuqjYF8HhEvkvmjm6AxGEkgGMtcc9GjWLEiMuaNE=
+github.com/jlambert68/FenixGrpcApi v0.0.0-20220119203808-3feab88f6792 h1:T8yItZDxLyJ7q8aR/EtZODBIxRdhuDv/l+LA9FT7560=
+github.com/jlambert68/FenixGrpcApi v0.0.0-20220119203808-3feab88f6792/go.mod h1:XXqQuqjYF8HhEvkvmjm6AxGEkgGMtcc9GjWLEiMuaNE=
 github.com/jung-kurt/gofpdf v1.0.0/go.mod h1:7Id9E/uU8ce6rXgefFLlgrJj/GYY22cpxn+r32jIOes=
 github.com/jung-kurt/gofpdf v1.0.3-0.20190309125859-24315acbbda5/go.mod h1:7Id9E/uU8ce6rXgefFLlgrJj/GYY22cpxn+r32jIOes=
 github.com/phpdave11/gofpdf v1.4.2/go.mod h1:zpO6xFn9yxo3YLyMvW8HcKWVdbNqgIfOOp2dXMnm1mY=
