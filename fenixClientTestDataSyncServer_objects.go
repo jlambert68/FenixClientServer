@@ -2,7 +2,6 @@ package main
 
 import (
 	"FenixClientServer/common_config"
-	echo "github.com/jlambert68/FenixGrpcApi/Client/fenixClientTestDataSyncServerGrpcApi/echo/go_grpc_api"
 	fenixClientTestDataSyncServerGrpcApi "github.com/jlambert68/FenixGrpcApi/Client/fenixClientTestDataSyncServerGrpcApi/go_grpc_api"
 	fenixTestDataSyncServerGrpcApi "github.com/jlambert68/FenixGrpcApi/Fenix/fenixTestDataSyncServerGrpcApi/go_grpc_api"
 	"github.com/sirupsen/logrus"
@@ -61,6 +60,10 @@ var highestFenixProtoFileVersion int32 = -1
 var highestClientProtoFileVersion int32 = -1
 
 // Echo gRPC-server
+/*
 type ecServer struct {
 	echo.UnimplementedEchoServer
 }
+
+
+*/

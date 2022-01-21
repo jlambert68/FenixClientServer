@@ -5,7 +5,6 @@ import (
 	fenixClientTestDataSyncServerGrpcApi "github.com/jlambert68/FenixGrpcApi/Client/fenixClientTestDataSyncServerGrpcApi/go_grpc_api"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
 	"net"
 	"strconv"
 )
@@ -54,7 +53,7 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 	fenixClientTestDataSyncServerGrpcApi.RegisterFenixClientTestDataGrpcServicesServer(registerfenixClientTestDataSyncServerServer, &FenixClientTestDataGrpcServicesServer{})
 
 	// Register RouteGuide on the same server.
-	reflection.Register(registerfenixClientTestDataSyncServerServer)
+	//reflection.Register(registerfenixClientTestDataSyncServerServer)
 
 	fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
 		"Id":                           "e843ece9-b707-4c60-b1d8-14464305e68f",

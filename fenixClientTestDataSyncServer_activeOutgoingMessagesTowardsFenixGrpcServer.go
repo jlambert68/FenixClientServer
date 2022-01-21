@@ -2,12 +2,14 @@ package main
 
 import (
 	"FenixClientServer/common_config"
+	"crypto/tls"
 	"github.com/go-gota/gota/dataframe"
 	fenixClientTestDataSyncServerGrpcApi "github.com/jlambert68/FenixGrpcApi/Client/fenixClientTestDataSyncServerGrpcApi/go_grpc_api"
 	fenixTestDataSyncServerGrpcApi "github.com/jlambert68/FenixGrpcApi/Fenix/fenixTestDataSyncServerGrpcApi/go_grpc_api"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"log"
 	"os"
 )
@@ -18,8 +20,16 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 
 	var err error
 
+	creds := credentials.NewTLS(&tls.Config{
+		InsecureSkipVerify: true,
+	})
+
+	opts := []grpc.DialOption{
+		grpc.WithTransportCredentials(creds),
+	}
+
 	// Set up connection to FenixTestDataSyncServer
-	remoteFenixTestDataSyncServerConnection, err = grpc.Dial(fenixTestDataSyncServer_address_to_dial, grpc.WithInsecure())
+	remoteFenixTestDataSyncServerConnection, err = grpc.Dial(fenixTestDataSyncServer_address_to_dial, opts...)
 	if err != nil {
 		fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
 			"fenixTestDataSyncServer_address_to_dial": fenixTestDataSyncServer_address_to_dial,
@@ -395,5 +405,42 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 			}).Error("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendTestDataRows'")
 		}
 	}
+
+}
+
+// ********************************************************************************************************************
+// Send the client's TestDataHeaders to Fenix by calling Fenix's gPRC server
+func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) SendAreYouAliveToFenixTestDataServer() (bool, string) {
+
+	// Set up connection to Server
+	fenixClientTestDataSyncServerObject.SetConnectionToFenixTestDataSyncServer()
+
+	// Create the message with all test data to be sent to Fenix
+	emptyParameter := &fenixTestDataSyncServerGrpcApi.EmptyParameter{
+
+		ProtoFileVersionUsedByClient: fenixTestDataSyncServerGrpcApi.CurrentFenixTestDataProtoFileVersionEnum(fenixClientTestDataSyncServerObject.getHighestFenixProtoFileVersion()),
+	}
+
+	// Do gRPC-call
+	ctx := context.Background()
+	returnMessage, err := fenixTestDataSyncServerClient.AreYouAlive(ctx, emptyParameter)
+
+	// Shouldn't happen
+	if err != nil {
+		fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+			"ID":    "818aaf0b-4112-4be4-97b9-21cc084c7b8b",
+			"error": err,
+		}).Fatal("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendTestDataRows'")
+
+		// FenixTestDataSyncServer couldn't handle gPRC call
+		if returnMessage.Acknack == false {
+			fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+				"ID": "2ecbc800-2fb6-4e88-858d-a421b61c5529",
+				"Message from FenixTestDataSyncServerObject": returnMessage.Comments,
+			}).Error("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendTestDataRows'")
+		}
+	}
+
+	return returnMessage.Acknack, returnMessage.Comments
 
 }

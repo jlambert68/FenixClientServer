@@ -7,6 +7,23 @@ import (
 )
 
 // *********************************************************************
+//Ask Client to call Fenix Server to check if Fenix Testdata Server is alive with this service
+func (s *FenixClientTestDataGrpcServicesServer) AreFenixTestDataSyncServerAlive(ctx context.Context, emptyParameter *fenixClientTestDataSyncServerGrpcApi.EmptyParameter) (*fenixClientTestDataSyncServerGrpcApi.AckNackResponse, error) {
+
+	fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+		"id": "28c7f393-b2be-4726-a5c0-93689c94f399",
+	}).Debug("Incoming 'AreFenixTestDataSyncServerAlive'")
+
+	defer fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+		"id": "5a770ebc-55be-404c-a608-413b0f9f8c15",
+	}).Debug("Outgoing 'AreFenixTestDataSyncServerAlive'")
+
+	serverStatus, serverMessage := fenixClientTestDataSyncServerObject.SendAreYouAliveToFenixTestDataServer()
+
+	return &fenixClientTestDataSyncServerGrpcApi.AckNackResponse{Acknack: serverStatus, Comments: "Server said to me: " + serverMessage}, nil
+}
+
+// *********************************************************************
 //Fenix client can check if Fenix Testdata sync server is alive with this service
 func (s *FenixClientTestDataGrpcServicesServer) AreYouAlive(ctx context.Context, emptyParameter *fenixClientTestDataSyncServerGrpcApi.EmptyParameter) (*fenixClientTestDataSyncServerGrpcApi.AckNackResponse, error) {
 
@@ -18,7 +35,7 @@ func (s *FenixClientTestDataGrpcServicesServer) AreYouAlive(ctx context.Context,
 		"id": "9c7f0c3d-7e9f-4c91-934e-8d7a22926d84",
 	}).Debug("Outgoing 'AreYouAlive'")
 
-	return &fenixClientTestDataSyncServerGrpcApi.AckNackResponse{Acknack: true, Comments: "I'am alive"}, nil
+	return &fenixClientTestDataSyncServerGrpcApi.AckNackResponse{Acknack: true, Comments: "I'am alive, from Client"}, nil
 }
 
 // *********************************************************************

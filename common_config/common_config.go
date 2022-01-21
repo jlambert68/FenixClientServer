@@ -3,8 +3,8 @@ package common_config
 import "github.com/sirupsen/logrus"
 
 // gRPC-ports
-const FenixTestDataSyncServer_address = "127.0.0.1"
-const FenixTestDataSyncServer_port = 6660
+const FenixTestDataSyncServer_address = "fenixtestdataserver-nwxrrpoxea-lz.a.run.app" //"127.0.0.1"
+const FenixTestDataSyncServer_port = 443
 
 const FenixClientTestDataSyncServer_address = "127.0.0.1"
 const FenixClientTestDataSyncServer_initial_port = 5998
