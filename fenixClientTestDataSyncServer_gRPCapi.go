@@ -105,7 +105,26 @@ func (s *FenixClientTestDataGrpcServicesServer) SendTestDataRows(ctx context.Con
 	}).Debug("Outgoing 'SendTestDataRows'")
 
 	// Send TestDataRows to Fenix after sending return message back to caller
-	defer fenixClientTestDataSyncServerObject.SendTestDataRows()
+	//TODO Implement the following outgoing function
+	//defer fenixClientTestDataSyncServerObject.SendTestDataRows()
+
+	return &fenixClientTestDataSyncServerGrpcApi.AckNackResponse{Acknack: true, Comments: ""}, nil
+}
+
+// *********************************************************************
+// Fenix client can send All TestData rows to Fenix Testdata sync server with this service
+func (s *FenixClientTestDataGrpcServicesServer) SendAllTestDataRows(ctx context.Context, emptyParameter *fenixClientTestDataSyncServerGrpcApi.EmptyParameter) (*fenixClientTestDataSyncServerGrpcApi.AckNackResponse, error) {
+
+	fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+		"id": "7708888f-edb0-4b87-97b7-cb2ce3b93d4a",
+	}).Debug("Incoming 'SendTestDataRows'")
+
+	defer fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+		"id": "7bc8a6bd-8d8e-4244-98bf-cd5ca686d3f2",
+	}).Debug("Outgoing 'SendTestDataRows'")
+
+	// Send TestDataRows to Fenix after sending return message back to caller
+	defer fenixClientTestDataSyncServerObject.SendAllTestDataRows()
 
 	return &fenixClientTestDataSyncServerGrpcApi.AckNackResponse{Acknack: true, Comments: ""}, nil
 }

@@ -2,14 +2,12 @@ package main
 
 import (
 	"FenixClientServer/common_config"
-	"crypto/tls"
 	"github.com/go-gota/gota/dataframe"
 	fenixClientTestDataSyncServerGrpcApi "github.com/jlambert68/FenixGrpcApi/Client/fenixClientTestDataSyncServerGrpcApi/go_grpc_api"
 	fenixTestDataSyncServerGrpcApi "github.com/jlambert68/FenixGrpcApi/Fenix/fenixTestDataSyncServerGrpcApi/go_grpc_api"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 	"log"
 	"os"
 )
@@ -19,17 +17,21 @@ import (
 func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) SetConnectionToFenixTestDataSyncServer() {
 
 	var err error
+	//TODO fixa så att man får en automatisk kontroll av Servers placering local/GCP
+	// If Fenix TestData-server runs on GCP then
+	/*
+		creds := credentials.NewTLS(&tls.Config{
+			InsecureSkipVerify: true,
+		})
 
-	creds := credentials.NewTLS(&tls.Config{
-		InsecureSkipVerify: true,
-	})
+		opts := []grpc.DialOption{
+			grpc.WithTransportCredentials(creds),
+		}
 
-	opts := []grpc.DialOption{
-		grpc.WithTransportCredentials(creds),
-	}
 
+	*/
 	// Set up connection to FenixTestDataSyncServer
-	remoteFenixTestDataSyncServerConnection, err = grpc.Dial(fenixTestDataSyncServer_address_to_dial, opts...)
+	remoteFenixTestDataSyncServerConnection, err = grpc.Dial(fenixTestDataSyncServer_address_to_dial, grpc.WithInsecure()) //opts...)
 	if err != nil {
 		fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
 			"fenixTestDataSyncServer_address_to_dial": fenixTestDataSyncServer_address_to_dial,
@@ -327,7 +329,7 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 // TODO - fix so fkn can take which rows to send back
 // ********************************************************************************************************************
 // Send the client's TestDataRow to Fenix by calling Fenix's gPRC server
-func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) SendTestDataRows() {
+func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) SendAllTestDataRows() {
 
 	var testdataRowsMessages *fenixTestDataSyncServerGrpcApi.TestdataRowsMessages
 	var testdataRows []*fenixTestDataSyncServerGrpcApi.TestDataRowMessage
