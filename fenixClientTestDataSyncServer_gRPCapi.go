@@ -75,6 +75,24 @@ func (s *FenixClientTestDataGrpcServicesServer) SendMerkleTree(ctx context.Conte
 }
 
 // *********************************************************************
+// Fenix client can send TestDataHeaderHash to Fenix Testdata sync server with this service
+func (s *FenixClientTestDataGrpcServicesServer) SendTestDataHeaderHash(ctx context.Context, testDataHeaderMessage *fenixClientTestDataSyncServerGrpcApi.EmptyParameter) (*fenixClientTestDataSyncServerGrpcApi.AckNackResponse, error) {
+
+	fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+		"id": "ff642667-2cbd-4f23-91eb-a6f8e76d9177",
+	}).Debug("Incoming 'SendTestDataHeaderHash'")
+
+	defer fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+		"id": "2c24b079-1e0b-46e9-ad1f-d47e8ff0d3b4",
+	}).Debug("Outgoing 'SendTestDataHeaderHash'")
+
+	// Send TestDataHeaderHash to Fenix after sending return message back to caller
+	defer fenixClientTestDataSyncServerObject.SendTestDataHeaderHash()
+
+	return &fenixClientTestDataSyncServerGrpcApi.AckNackResponse{Acknack: true, Comments: ""}, nil
+}
+
+// *********************************************************************
 // Fenix client can send TestDataHeaders to Fenix Testdata sync server with this service
 func (s *FenixClientTestDataGrpcServicesServer) SendTestDataHeaders(ctx context.Context, testDataHeaderMessage *fenixClientTestDataSyncServerGrpcApi.EmptyParameter) (*fenixClientTestDataSyncServerGrpcApi.AckNackResponse, error) {
 
