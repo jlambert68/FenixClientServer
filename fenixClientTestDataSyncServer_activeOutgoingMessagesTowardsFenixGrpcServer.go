@@ -364,11 +364,11 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 				HeaderSelectionType:                  fenixTestDataSyncServerGrpcApi.HeaderSelectionTypeEnum_HEADER_IS_SINGLE_SELECT,
 				HeaderFilterValues:                   headerFilterValues,
 			}
+			testDataHeaderItemsMessage = append(testDataHeaderItemsMessage, testDataHeaderItemMessage)
 		} else {
 			testDataHashColumn = headerColumnNumber
 		}
 
-		testDataHeaderItemsMessage = append(testDataHeaderItemsMessage, testDataHeaderItemMessage)
 	}
 
 	// Remove TestDataHash-column
