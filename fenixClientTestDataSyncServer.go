@@ -7,7 +7,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 )
 
@@ -34,14 +33,7 @@ func cleanup() {
 func FenixClientServer_main() {
 
 	// Set up BackendObject
-	fenixClientTestDataSyncServerObject = &fenixClientTestDataSyncServerObject_struct{
-		iAmBusy:               false,
-		qmlServerHasConnected: false}
-
-	// Create unique id for this Backend Server
-	uuId, _ := uuid.NewUUID()
-	fmt.Println(uuId)
-	fenixClientTestDataSyncServerObject.uuid = uuId.String()
+	fenixClientTestDataSyncServerObject = &fenixClientTestDataSyncServerObject_struct{}
 
 	// Init logger
 	fenixClientTestDataSyncServerObject.InitLogger("")

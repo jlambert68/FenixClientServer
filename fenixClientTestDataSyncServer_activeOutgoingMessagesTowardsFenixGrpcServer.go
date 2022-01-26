@@ -273,23 +273,23 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 // SendTestDataHeaderHash - Send the client's TestDataHeaderHash to Fenix by calling Fenix's gPRC server
 func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) SendTestDataHeaderHash() {
 
-	var testDataHashColumn int
 	var testDataHeaderItemMessage *fenixTestDataSyncServerGrpcApi.TestDataHeaderItemMessage
 	var testDataHeaderItemsMessage []*fenixTestDataSyncServerGrpcApi.TestDataHeaderItemMessage
 	_, _, testDataHeaders := common_config.LoadAndProcessFile(testFile)
+	var testDataHeaderItemMessageHashArray []string
 
 	// Extract Header names, from sub set of testdata(1 row)
 	testDataSubSet := testDataHeaders.Subset(0)
 	headerData := testDataSubSet.Records()[0]
 
 	// Create variables to be sent to FenixTestDataSyncServer
-	for headerColumnNumber, header := range headerData {
+	for _, header := range headerData {
 		if header != "TestDataHash" {
 			var headerFilterValues []*fenixTestDataSyncServerGrpcApi.HeaderFilterValue
 			headerFilterValue := &fenixTestDataSyncServerGrpcApi.HeaderFilterValue{HeaderFilterValuesAsString: "value 1"}
 			headerFilterValues = append(headerFilterValues, headerFilterValue)
 			testDataHeaderItemMessage = &fenixTestDataSyncServerGrpcApi.TestDataHeaderItemMessage{
-				TestDataHeaderItemMessageHash:       "XXX", //TODO - Fix this
+				TestDataHeaderItemMessageHash:       "XXX Is set below in the code XXX",
 				HeaderPresentationsLabel:            header,
 				HeaderDataLabel:                     header,
 				HeaderShouldBeUsedForTestDataFilter: false,
@@ -297,28 +297,24 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 				HeaderSelectionType:                 fenixTestDataSyncServerGrpcApi.HeaderSelectionTypeEnum_HEADER_IS_SINGLE_SELECT,
 				HeaderFilterValues:                  headerFilterValues,
 			}
+			// Add hash value to 'TestDataHeaderItemMessageHash'
+			testDataHeaderItemMessageHash := common_config.CreateTestDataHeaderItemMessageHash(testDataHeaderItemMessage)
+			testDataHeaderItemMessage.TestDataHeaderItemMessageHash = testDataHeaderItemMessageHash
 
-		} else {
-			testDataHashColumn = headerColumnNumber
+			testDataHeaderItemsMessage = append(testDataHeaderItemsMessage, testDataHeaderItemMessage)
+			testDataHeaderItemMessageHashArray = append(testDataHeaderItemMessageHashArray, testDataHeaderItemMessageHash)
+
 		}
 
-		testDataHeaderItemsMessage = append(testDataHeaderItemsMessage, testDataHeaderItemMessage)
 	}
 
-	// Remove TestDataHash-column
-	testDataHeaders = testDataHeaders.Drop(testDataHashColumn)
-
-	// Get all headers as a string array
-	headers := testDataHeaders.Names()
-
-	// Hash the header into a single hash
-	// TODO Redo how HeaderHash is calculated, all filter values must be included
-	headerHash := common_config.HashValues(headers)
+	// Hash all 'testDataHeaderItemMessageHash' into a single hash
+	testDataHeaderItemMessageHash := common_config.HashValues(testDataHeaderItemMessageHashArray)
 
 	// HeaderHash message to be set to TestDataSyncServer
 	testDataHeaderMessage := &fenixTestDataSyncServerGrpcApi.TestDataHeaderHashMessage{
-		TestDataClientUuid: common_config.FenicClientTestDataSyncServer_TestDataClientUuid,
-		HeadersHash:        headerHash,
+		TestDataClientUuid:      common_config.FenicClientTestDataSyncServer_TestDataClientUuid,
+		TestDataHeaderItemsHash: testDataHeaderItemMessageHash,
 		ProtoFileVersionUsedByClient: fenixTestDataSyncServerGrpcApi.CurrentFenixTestDataProtoFileVersionEnum(
 			fenixClientTestDataSyncServerObject.getHighestFenixProtoFileVersion()),
 	}
@@ -353,23 +349,24 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 // SendTestDataHeaders - Send the client's TestDataHeaders to Fenix by calling Fenix's gPRC server
 func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) SendTestDataHeaders() {
 
-	var testDataHashColumn int
 	var testDataHeaderItemMessage *fenixTestDataSyncServerGrpcApi.TestDataHeaderItemMessage
 	var testDataHeaderItemsMessage []*fenixTestDataSyncServerGrpcApi.TestDataHeaderItemMessage
 	_, _, testDataHeaders := common_config.LoadAndProcessFile(testFile)
+
+	var testDataHeaderItemMessageHashArray []string
 
 	// Extract Header names, from sub set of testdata(1 row)
 	testDataSubSet := testDataHeaders.Subset(0)
 	headerData := testDataSubSet.Records()[0]
 
 	// Create variables to be sent to FenixTestDataSyncServer
-	for headerColumnNumber, header := range headerData {
+	for _, header := range headerData {
 		if header != "TestDataHash" {
 			var headerFilterValues []*fenixTestDataSyncServerGrpcApi.HeaderFilterValue
 			headerFilterValue := &fenixTestDataSyncServerGrpcApi.HeaderFilterValue{HeaderFilterValuesAsString: "value 1"}
 			headerFilterValues = append(headerFilterValues, headerFilterValue)
 			testDataHeaderItemMessage = &fenixTestDataSyncServerGrpcApi.TestDataHeaderItemMessage{
-				TestDataHeaderItemMessageHash:       "XXX", //TODO - Fix this
+				TestDataHeaderItemMessageHash:       "XXX Is set below in the code XXX",
 				HeaderPresentationsLabel:            header,
 				HeaderDataLabel:                     header,
 				HeaderShouldBeUsedForTestDataFilter: false,
@@ -377,33 +374,25 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 				HeaderSelectionType:                 fenixTestDataSyncServerGrpcApi.HeaderSelectionTypeEnum_HEADER_IS_SINGLE_SELECT,
 				HeaderFilterValues:                  headerFilterValues,
 			}
-			// Add hash value
+			// Add hash value to 'TestDataHeaderItemMessageHash'
 			testDataHeaderItemMessageHash := common_config.CreateTestDataHeaderItemMessageHash(testDataHeaderItemMessage)
 			testDataHeaderItemMessage.TestDataHeaderItemMessageHash = testDataHeaderItemMessageHash
 
 			testDataHeaderItemsMessage = append(testDataHeaderItemsMessage, testDataHeaderItemMessage)
-		} else {
-			testDataHashColumn = headerColumnNumber
+			testDataHeaderItemMessageHashArray = append(testDataHeaderItemMessageHashArray, testDataHeaderItemMessageHash)
+
 		}
 
 	}
 
-	// Remove TestDataHash-column
-	testDataHeaders = testDataHeaders.Drop(testDataHashColumn)
-
-	// Get all headers as a string array
-	headers := testDataHeaders.Names()
-
-	// Hash the header into a single hash
-	// TODO Redo how HeaderHash is calculated, all filter values must be included
-	headerHash := common_config.HashValues(headers)
+	// Hash all 'testDataHeaderItemMessageHash' into a single hash
+	testDataHeaderItemMessageHash := common_config.HashValues(testDataHeaderItemMessageHashArray)
 
 	// Header message to be set to  TestDataSyncServer
 	testDataHeaderMessage := &fenixTestDataSyncServerGrpcApi.TestDataHeadersMessage{
-		TestDataClientUuid:       common_config.FenicClientTestDataSyncServer_TestDataClientUuid,
-		TestDataHeaderLabelsHash: headerHash,
-		TestDataHeaderItemsHash:  "XXX", //TODO - Fix this
-		TestDataHeaderItems:      testDataHeaderItemsMessage,
+		TestDataClientUuid:      common_config.FenicClientTestDataSyncServer_TestDataClientUuid,
+		TestDataHeaderItemsHash: testDataHeaderItemMessageHash,
+		TestDataHeaderItems:     testDataHeaderItemsMessage,
 		ProtoFileVersionUsedByClient: fenixTestDataSyncServerGrpcApi.CurrentFenixTestDataProtoFileVersionEnum(
 			fenixClientTestDataSyncServerObject.getHighestFenixProtoFileVersion()),
 	}
