@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/go-gota/gota v0.12.0
 	github.com/google/uuid v1.3.0
-	github.com/jlambert68/FenixGrpcApi v0.0.0-20220124100546-565f35bce899
+	github.com/jlambert68/FenixGrpcApi v0.0.0-20220126115112-d88b7c0c0713
 	github.com/sirupsen/logrus v1.8.1
 	golang.org/x/net v0.0.0-20220114011407-0dd24b26b47d
 	google.golang.org/grpc v1.43.0

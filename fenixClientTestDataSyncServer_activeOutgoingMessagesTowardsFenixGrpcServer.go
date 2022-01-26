@@ -13,7 +13,8 @@ import (
 )
 
 // ********************************************************************************************************************
-// Set upp connection and Dial to FenixTestDataSyncServer
+
+// SetConnectionToFenixTestDataSyncServer - Set upp connection and Dial to FenixTestDataSyncServer
 func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) SetConnectionToFenixTestDataSyncServer() {
 
 	var err error
@@ -50,6 +51,7 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 }
 
 // ********************************************************************************************************************
+
 // Get the highest FenixProtoFileVersionEnumeration
 func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) getHighestFenixProtoFileVersion() int32 {
 
@@ -131,16 +133,17 @@ func getCurrentTestDataMerkleTree() fenixTestDataSyncServerGrpcApi.MerkleTreeMes
 }
 
 // ********************************************************************************************************************
-// Register the client at Fenix by calling Fenix's gPRC server
+
+// RegisterTestDataClient  - Register the client at Fenix by calling Fenix's gPRC server
 func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) RegisterTestDataClient() {
 
 	// Set up variables to be sent to FenixTestDataSyncServer
 	TestDataClientInformationMessage := fenixTestDataSyncServerGrpcApi.TestDataClientInformationMessage{
-		TestDataClientGuid:           common_config.FenicClientTestDataSyncServer_TestDataClientGuid,
-		TestDomainGuid:               common_config.FenicClientTestDataSyncServer_DomainGuid,
+		TestDataClientUuid:           common_config.FenicClientTestDataSyncServer_TestDataClientUuid,
+		TestDomainUuid:               common_config.FenicClientTestDataSyncServer_DomainUuid,
 		TestDomainName:               common_config.FenicClientTestDataSyncServer_DomainName,
 		TestDataClientIpAddress:      common_config.FenixClientTestDataSyncServer_address,
-		TestDataClientPort:           string(common_config.FenixClientTestDataSyncServer_initial_port),
+		TestDataClientPort:           string(rune(common_config.FenixClientTestDataSyncServer_initial_port)),
 		ProtoFileVersionUsedByClient: fenixTestDataSyncServerGrpcApi.CurrentFenixTestDataProtoFileVersionEnum(fenixClientTestDataSyncServerObject.getHighestFenixProtoFileVersion()),
 	}
 
@@ -159,7 +162,7 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 		}).Fatal("Problem to do gRPC-call to FenixTestDataSyncServer for 'RegisterTestDataClient'")
 
 		// FenixTestDataSyncServer couldn't handle gPRC call
-		if returnMessage.Acknack == false {
+		if returnMessage.AckNack == false {
 			fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
 				"ID": "44671efb-e24d-450a-acba-006cc248d058",
 				"Message from FenixTestDataSyncServerObject": returnMessage.Comments,
@@ -170,15 +173,17 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 }
 
 // ********************************************************************************************************************
-// Send the client's MerkleHash to Fenix by calling Fenix's gPRC server
+
+// SendMerkleHash - Send the client's MerkleHash to Fenix by calling Fenix's gPRC server
 func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) SendMerkleHash() {
 
 	merkleRootHash, _, _ := common_config.LoadAndProcessFile(testFile)
 
 	// Set up variables to be sent to FenixTestDataSyncServer
 	merkleHashMessage := fenixTestDataSyncServerGrpcApi.MerkleHashMessage{
-		TestDataClientGuid: common_config.FenicClientTestDataSyncServer_TestDataClientGuid,
+		TestDataClientUuid: common_config.FenicClientTestDataSyncServer_TestDataClientUuid,
 		MerkleHash:         merkleRootHash,
+		MerkleFilter:       merkleFilterPath,
 		ProtoFileVersionUsedByClient: fenixTestDataSyncServerGrpcApi.CurrentFenixTestDataProtoFileVersionEnum(
 			fenixClientTestDataSyncServerObject.getHighestFenixProtoFileVersion()),
 	}
@@ -198,7 +203,7 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 		}).Fatal("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendMerkleHash'")
 
 		// FenixTestDataSyncServer couldn't handle gPRC call
-		if returnMessage.Acknack == false {
+		if returnMessage.AckNack == false {
 			fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
 				"ID": "fb923a55-136e-481e-9c30-d7d7019e17e3",
 				"Message from FenixTestDataSyncServerObject": returnMessage.Comments,
@@ -209,7 +214,8 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 }
 
 // ********************************************************************************************************************
-// Send the client's MerkleTree to Fenix by calling Fenix's gPRC server
+
+// SendMerkleTree - Send the client's MerkleTree to Fenix by calling Fenix's gPRC server
 func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) SendMerkleTree() {
 
 	var merkleTreeNodeMessages []*fenixTestDataSyncServerGrpcApi.MerkleTreeNodeMessage
@@ -221,15 +227,17 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 	for rowCounter := 0; rowCounter < merkleTreeNRows; rowCounter++ {
 		merkleLevel, _ := merkleTree.Elem(rowCounter, 0).Int()
 		merkleTreeNodeMessage := &fenixTestDataSyncServerGrpcApi.MerkleTreeNodeMessage{
-			MerkleLevel:     int64(merkleLevel),
-			MerklePath:      merkleTree.Elem(rowCounter, 1).String(),
-			MerkleHash:      merkleTree.Elem(rowCounter, 2).String(),
-			MerkleChildHash: merkleTree.Elem(rowCounter, 3).String(),
+			NodeLevel:     uint32(merkleLevel),
+			NodeName:      "XXX", //TODO - Fix this
+			NodePath:      merkleTree.Elem(rowCounter, 1).String(),
+			NodeHash:      merkleTree.Elem(rowCounter, 2).String(),
+			NodeChildHash: merkleTree.Elem(rowCounter, 3).String(),
 		}
+
 		merkleTreeNodeMessages = append(merkleTreeNodeMessages, merkleTreeNodeMessage)
 	}
 	merkleTreeMessage := &fenixTestDataSyncServerGrpcApi.MerkleTreeMessage{
-		TestDataClientGuid: common_config.FenicClientTestDataSyncServer_TestDataClientGuid,
+		TestDataClientUuid: common_config.FenicClientTestDataSyncServer_TestDataClientUuid,
 		MerkleTreeNodes:    merkleTreeNodeMessages,
 		ProtoFileVersionUsedByClient: fenixTestDataSyncServerGrpcApi.CurrentFenixTestDataProtoFileVersionEnum(
 			fenixClientTestDataSyncServerObject.getHighestFenixProtoFileVersion()),
@@ -250,7 +258,7 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 		}).Fatal("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendMerkleTree'")
 
 		// FenixTestDataSyncServer couldn't handle gPRC call
-		if returnMessage.Acknack == false {
+		if returnMessage.AckNack == false {
 			fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
 				"ID": "d8225481-d28c-426c-9cdb-986678001e5c",
 				"Message from FenixTestDataSyncServerObject": returnMessage.Comments,
@@ -261,7 +269,8 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 }
 
 // ********************************************************************************************************************
-// Send the client's TestDataHeaderHash to Fenix by calling Fenix's gPRC server
+
+// SendTestDataHeaderHash - Send the client's TestDataHeaderHash to Fenix by calling Fenix's gPRC server
 func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) SendTestDataHeaderHash() {
 
 	var testDataHashColumn int
@@ -280,13 +289,15 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 			headerFilterValue := &fenixTestDataSyncServerGrpcApi.HeaderFilterValue{HeaderFilterValuesAsString: "value 1"}
 			headerFilterValues = append(headerFilterValues, headerFilterValue)
 			testDataHeaderItemMessage = &fenixTestDataSyncServerGrpcApi.TestDataHeaderItemMessage{
-				HeaderPresentationsLabel:             header,
-				HeaderDataLabel:                      header,
-				HeaderShouldbBeUsedForTestDataFilter: false,
-				HeaderIsMandatoryInTestDataFilter:    false,
-				HeaderSelectionType:                  fenixTestDataSyncServerGrpcApi.HeaderSelectionTypeEnum_HEADER_IS_SINGLE_SELECT,
-				HeaderFilterValues:                   headerFilterValues,
+				TestDataHeaderItemMessageHash:       "XXX", //TODO - Fix this
+				HeaderPresentationsLabel:            header,
+				HeaderDataLabel:                     header,
+				HeaderShouldBeUsedForTestDataFilter: false,
+				HeaderIsMandatoryInTestDataFilter:   false,
+				HeaderSelectionType:                 fenixTestDataSyncServerGrpcApi.HeaderSelectionTypeEnum_HEADER_IS_SINGLE_SELECT,
+				HeaderFilterValues:                  headerFilterValues,
 			}
+
 		} else {
 			testDataHashColumn = headerColumnNumber
 		}
@@ -306,7 +317,7 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 
 	// HeaderHash message to be set to TestDataSyncServer
 	testDataHeaderMessage := &fenixTestDataSyncServerGrpcApi.TestDataHeaderHashMessage{
-		TestDataClientGuid: common_config.FenicClientTestDataSyncServer_TestDataClientGuid,
+		TestDataClientUuid: common_config.FenicClientTestDataSyncServer_TestDataClientUuid,
 		HeadersHash:        headerHash,
 		ProtoFileVersionUsedByClient: fenixTestDataSyncServerGrpcApi.CurrentFenixTestDataProtoFileVersionEnum(
 			fenixClientTestDataSyncServerObject.getHighestFenixProtoFileVersion()),
@@ -327,7 +338,7 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 		}).Fatal("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendTestDataHeaders'")
 
 		// FenixTestDataSyncServer couldn't handle gPRC call
-		if returnMessage.Acknack == false {
+		if returnMessage.AckNack == false {
 			fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
 				"ID": "1a2a215f-6356-49a5-a7db-e9a9ead2fe6e",
 				"Message from FenixTestDataSyncServerObject": returnMessage.Comments,
@@ -338,7 +349,8 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 }
 
 // ********************************************************************************************************************
-// Send the client's TestDataHeaders to Fenix by calling Fenix's gPRC server
+
+// SendTestDataHeaders - Send the client's TestDataHeaders to Fenix by calling Fenix's gPRC server
 func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) SendTestDataHeaders() {
 
 	var testDataHashColumn int
@@ -357,13 +369,18 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 			headerFilterValue := &fenixTestDataSyncServerGrpcApi.HeaderFilterValue{HeaderFilterValuesAsString: "value 1"}
 			headerFilterValues = append(headerFilterValues, headerFilterValue)
 			testDataHeaderItemMessage = &fenixTestDataSyncServerGrpcApi.TestDataHeaderItemMessage{
-				HeaderPresentationsLabel:             header,
-				HeaderDataLabel:                      header,
-				HeaderShouldbBeUsedForTestDataFilter: false,
-				HeaderIsMandatoryInTestDataFilter:    false,
-				HeaderSelectionType:                  fenixTestDataSyncServerGrpcApi.HeaderSelectionTypeEnum_HEADER_IS_SINGLE_SELECT,
-				HeaderFilterValues:                   headerFilterValues,
+				TestDataHeaderItemMessageHash:       "XXX", //TODO - Fix this
+				HeaderPresentationsLabel:            header,
+				HeaderDataLabel:                     header,
+				HeaderShouldBeUsedForTestDataFilter: false,
+				HeaderIsMandatoryInTestDataFilter:   false,
+				HeaderSelectionType:                 fenixTestDataSyncServerGrpcApi.HeaderSelectionTypeEnum_HEADER_IS_SINGLE_SELECT,
+				HeaderFilterValues:                  headerFilterValues,
 			}
+			// Add hash value
+			testDataHeaderItemMessageHash := common_config.CreateTestDataHeaderItemMessageHash(testDataHeaderItemMessage)
+			testDataHeaderItemMessage.TestDataHeaderItemMessageHash = testDataHeaderItemMessageHash
+
 			testDataHeaderItemsMessage = append(testDataHeaderItemsMessage, testDataHeaderItemMessage)
 		} else {
 			testDataHashColumn = headerColumnNumber
@@ -382,10 +399,11 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 	headerHash := common_config.HashValues(headers)
 
 	// Header message to be set to  TestDataSyncServer
-	testDataHeaderMessage := &fenixTestDataSyncServerGrpcApi.TestDataHeaderMessage{
-		TestDataClientGuid:  common_config.FenicClientTestDataSyncServer_TestDataClientGuid,
-		HeadersHash:         headerHash,
-		TestDataHeaderItems: testDataHeaderItemsMessage,
+	testDataHeaderMessage := &fenixTestDataSyncServerGrpcApi.TestDataHeadersMessage{
+		TestDataClientUuid:       common_config.FenicClientTestDataSyncServer_TestDataClientUuid,
+		TestDataHeaderLabelsHash: headerHash,
+		TestDataHeaderItemsHash:  "XXX", //TODO - Fix this
+		TestDataHeaderItems:      testDataHeaderItemsMessage,
 		ProtoFileVersionUsedByClient: fenixTestDataSyncServerGrpcApi.CurrentFenixTestDataProtoFileVersionEnum(
 			fenixClientTestDataSyncServerObject.getHighestFenixProtoFileVersion()),
 	}
@@ -405,7 +423,7 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 		}).Fatal("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendTestDataHeaders'")
 
 		// FenixTestDataSyncServer couldn't handle gPRC call
-		if returnMessage.Acknack == false {
+		if returnMessage.AckNack == false {
 			fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
 				"ID": "3902e0d2-d28a-40e4-8aa8-553d31ac3b78",
 				"Message from FenixTestDataSyncServerObject": returnMessage.Comments,
@@ -417,7 +435,8 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 
 // TODO - fix so fkn can take which rows to send back
 // ********************************************************************************************************************
-// Send the client's TestDataRow to Fenix by calling Fenix's gPRC server
+
+// SendAllTestDataRows - Send the client's TestDataRow to Fenix by calling Fenix's gPRC server
 func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) SendAllTestDataRows() {
 
 	var testdataRowsMessages *fenixTestDataSyncServerGrpcApi.TestdataRowsMessages
@@ -438,14 +457,14 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 		dataframe.WithDelimiter(';'),
 		dataframe.HasHeader(true))
 
-	number_of_columns_to_process := df.Ncol()
+	numberOfColumnsToProcess := df.Ncol()
 	numberOfRows := df.Nrow()
 	for rowCounter := 0; rowCounter < numberOfRows; rowCounter++ {
 
 		var valuesToHash []string
 		var testdataItems []*fenixTestDataSyncServerGrpcApi.TestDataItemMessage
 
-		for columnCounter := 0; columnCounter < number_of_columns_to_process; columnCounter++ {
+		for columnCounter := 0; columnCounter < numberOfColumnsToProcess; columnCounter++ {
 			// add values for one row
 			testDataItemValueAsString = df.Elem(rowCounter, columnCounter).String()
 			testdataItemMessage = &fenixTestDataSyncServerGrpcApi.TestDataItemMessage{
@@ -469,7 +488,7 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 
 	// Create the message with all test data to be sent to Fenix
 	testdataRowsMessages = &fenixTestDataSyncServerGrpcApi.TestdataRowsMessages{
-		TestDataClientGuid:           common_config.FenicClientTestDataSyncServer_TestDataClientGuid,
+		TestDataClientUuid:           common_config.FenicClientTestDataSyncServer_TestDataClientUuid,
 		TestDataRows:                 testdataRows,
 		ProtoFileVersionUsedByClient: fenixTestDataSyncServerGrpcApi.CurrentFenixTestDataProtoFileVersionEnum(fenixClientTestDataSyncServerObject.getHighestFenixProtoFileVersion()),
 	}
@@ -489,7 +508,7 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 		}).Fatal("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendTestDataRows'")
 
 		// FenixTestDataSyncServer couldn't handle gPRC call
-		if returnMessage.Acknack == false {
+		if returnMessage.AckNack == false {
 			fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
 				"ID": "c1f6a351-fb7e-4759-81a7-04ec61b74e59",
 				"Message from FenixTestDataSyncServerObject": returnMessage.Comments,
@@ -500,7 +519,8 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 }
 
 // ********************************************************************************************************************
-// Send the client's TestDataHeaders to Fenix by calling Fenix's gPRC server
+
+// SendAreYouAliveToFenixTestDataServer - Send the client's TestDataHeaders to Fenix by calling Fenix's gPRC server
 func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) SendAreYouAliveToFenixTestDataServer() (bool, string) {
 
 	// Set up connection to Server
@@ -524,7 +544,7 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 		}).Fatal("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendTestDataRows'")
 
 		// FenixTestDataSyncServer couldn't handle gPRC call
-		if returnMessage.Acknack == false {
+		if returnMessage.AckNack == false {
 			fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
 				"ID": "2ecbc800-2fb6-4e88-858d-a421b61c5529",
 				"Message from FenixTestDataSyncServerObject": returnMessage.Comments,
@@ -532,6 +552,6 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 		}
 	}
 
-	return returnMessage.Acknack, returnMessage.Comments
+	return returnMessage.AckNack, returnMessage.Comments
 
 }

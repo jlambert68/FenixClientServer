@@ -8,21 +8,11 @@ import (
 	"google.golang.org/grpc"
 	"net"
 	"strconv"
-	"time"
 	//	ecpb "github.com/jlambert68/FenixGrpcApi/Client/fenixTestDataSyncServerGrpcApi/echo/go_grpc_api"
 )
 
 type fenixClientTestDataSyncServerObject_struct struct {
-	logger                *logrus.Logger
-	iAmBusy               bool
-	uuid                  string
-	startTime             time.Time
-	timeBeforeFinish      int32
-	currentTaskuuid       string
-	currentTaskName       string
-	ip                    string
-	port                  string
-	qmlServerHasConnected bool
+	logger *logrus.Logger
 }
 
 var fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct
