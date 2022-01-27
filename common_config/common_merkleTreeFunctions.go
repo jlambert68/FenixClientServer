@@ -13,14 +13,16 @@ import (
 	"github.com/go-gota/gota/dataframe"
 )
 
-func HashValues(valuesToHash []string) string {
+func HashValues(valuesToHash []string, isNonHashValue bool) string {
 
 	hash_string := ""
 	sha256_hash := ""
 
-	// Concatenate array position to its content
-	for valuePosition, value := range valuesToHash {
-		valuesToHash[valuePosition] = value + strconv.Itoa(valuePosition)
+	// Concatenate array position to its content if it is a 'NonHashValue'
+	if isNonHashValue == true {
+		for valuePosition, value := range valuesToHash {
+			valuesToHash[valuePosition] = value + strconv.Itoa(valuePosition)
+		}
 	}
 
 	// Always sort values before hash them
@@ -208,7 +210,7 @@ func LoadAndProcessFile(fileToprocess string) (string, dataframe.DataFrame, data
 		}
 
 		// Hash all values for row
-		hashedRow := HashValues(valuesToHash)
+		hashedRow := HashValues(valuesToHash, true)
 		df.Elem(rowCounter, number_of_columns_to_process).Set(hashedRow)
 
 	}
@@ -303,7 +305,7 @@ func calculateMerkleHashFromMerkleTreeLeafNodes(merkleLevel int, merkleTreeLeafN
 	}
 
 	// Hash the hashes into parent nodes hash value
-	merkleHash = HashValues(valuesToHash)
+	merkleHash = HashValues(valuesToHash, false)
 
 	return merkleHash
 

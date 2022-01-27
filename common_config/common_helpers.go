@@ -11,12 +11,8 @@ func CreateTestDataHeaderItemMessageHash(testDataHeaderItemMessage *fenixTestDat
 	var valueToHash string
 
 	// Extract and add values to array
-	// HeaderPresentationsLabel
-	valueToHash = testDataHeaderItemMessage.HeaderPresentationsLabel
-	valuesToHash = append(valuesToHash, valueToHash)
-
-	// HeaderDataLabel
-	valueToHash = testDataHeaderItemMessage.HeaderDataLabel
+	// HeaderLabel
+	valueToHash = testDataHeaderItemMessage.HeaderLabel
 	valuesToHash = append(valuesToHash, valueToHash)
 
 	// HeaderShouldBeUsedForTestDataFilter as 'true' or 'false'
@@ -38,11 +34,11 @@ func CreateTestDataHeaderItemMessageHash(testDataHeaderItemMessage *fenixTestDat
 	valuesToHash = append(valuesToHash, valueToHash)
 
 	// HeaderFilterValues - An array thar is added
-	valueToHash = testDataHeaderItemMessage.HeaderPresentationsLabel
+	valueToHash = testDataHeaderItemMessage.HeaderLabel
 	valuesToHash = append(valuesToHash, valueToHash)
 
 	// Hash all values in the array
-	testDataHeaderItemMessageHash = HashValues(valuesToHash)
+	testDataHeaderItemMessageHash = HashValues(valuesToHash, true)
 
 	return testDataHeaderItemMessageHash
 }
