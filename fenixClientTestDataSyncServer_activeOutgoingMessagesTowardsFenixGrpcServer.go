@@ -228,8 +228,8 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 		merkleLevel, _ := merkleTree.Elem(rowCounter, 0).Int()
 		merkleTreeNodeMessage := &fenixTestDataSyncServerGrpcApi.MerkleTreeNodeMessage{
 			NodeLevel:     uint32(merkleLevel),
-			NodeName:      "XXX", //TODO - Fix this
-			NodePath:      merkleTree.Elem(rowCounter, 1).String(),
+			NodeName:      merkleTree.Elem(rowCounter, 1).String(), //TODO - Fix this
+			NodePath:      merkleTree.Elem(rowCounter, 1).String(), //TODO - Fix this
 			NodeHash:      merkleTree.Elem(rowCounter, 2).String(),
 			NodeChildHash: merkleTree.Elem(rowCounter, 3).String(),
 		}

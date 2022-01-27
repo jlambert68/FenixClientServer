@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/go-gota/gota/dataframe"
@@ -17,9 +18,14 @@ func HashValues(valuesToHash []string) string {
 	hash_string := ""
 	sha256_hash := ""
 
-	// Allways sort values before hash them
+	// Concatenate array position to its content
+	for valuePosition, value := range valuesToHash {
+		valuesToHash[valuePosition] = value + strconv.Itoa(valuePosition)
+	}
 
+	// Always sort values before hash them
 	sort.Strings(valuesToHash)
+
 	//Hash all values
 	for _, valueToHash := range valuesToHash {
 		hash_string = hash_string + valueToHash
