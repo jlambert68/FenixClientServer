@@ -215,15 +215,14 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 		fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
 			"ID":    "6b080a23-4e06-4d16-8295-a67ba7115a56",
 			"error": err,
-		}).Fatal("Problem to do gRPC-call to FenixTestDataSyncServer for 'RegisterTestDataClient'")
+		}).Error("Problem to do gRPC-call to FenixTestDataSyncServer for 'RegisterTestDataClient'")
 
+	} else if returnMessage.AckNack == false {
 		// FenixTestDataSyncServer couldn't handle gPRC call
-		if returnMessage.AckNack == false {
-			fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
-				"ID": "44671efb-e24d-450a-acba-006cc248d058",
-				"Message from FenixTestDataSyncServerObject": returnMessage.Comments,
-			}).Error("Problem to do gRPC-call to FenixTestDataSyncServer for 'RegisterTestDataClient'")
-		}
+		fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+			"ID": "44671efb-e24d-450a-acba-006cc248d058",
+			"Message from FenixTestDataSyncServerObject": returnMessage.Comments,
+		}).Error("Problem to do gRPC-call to FenixTestDataSyncServer for 'RegisterTestDataClient'")
 	}
 
 }
@@ -256,15 +255,14 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 		fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
 			"ID":    "69a62788-b798-471a-bb8d-7fa1cec0f485",
 			"error": err,
-		}).Fatal("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendMerkleHash'")
+		}).Error("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendMerkleHash'")
 
+	} else if returnMessage.AckNack == false {
 		// FenixTestDataSyncServer couldn't handle gPRC call
-		if returnMessage.AckNack == false {
-			fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
-				"ID": "fb923a55-136e-481e-9c30-d7d7019e17e3",
-				"Message from FenixTestDataSyncServerObject": returnMessage.Comments,
-			}).Error("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendMerkleHash'")
-		}
+		fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+			"ID": "fb923a55-136e-481e-9c30-d7d7019e17e3",
+			"Message from FenixTestDataSyncServerObject": returnMessage.Comments,
+		}).Error("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendMerkleHash'")
 	}
 
 }
@@ -311,15 +309,14 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 		fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
 			"ID":    "c8a66468-17ca-4e0a-942b-a9ec9b246c82",
 			"error": err,
-		}).Fatal("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendMerkleTree'")
+		}).Error("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendMerkleTree'")
 
+	} else if returnMessage.AckNack == false {
 		// FenixTestDataSyncServer couldn't handle gPRC call
-		if returnMessage.AckNack == false {
-			fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
-				"ID": "d8225481-d28c-426c-9cdb-986678001e5c",
-				"Message from FenixTestDataSyncServerObject": returnMessage.Comments,
-			}).Error("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendMerkleTree'")
-		}
+		fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+			"ID": "d8225481-d28c-426c-9cdb-986678001e5c",
+			"Message from FenixTestDataSyncServerObject": returnMessage.Comments,
+		}).Error("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendMerkleTree'")
 	}
 
 }
@@ -386,15 +383,14 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 		fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
 			"ID":    "0f8d37a3-ac0d-4096-a5a7-c635cd434926",
 			"error": err,
-		}).Fatal("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendTestDataHeaders'")
+		}).Error("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendTestDataHeaders'")
 
+	} else if returnMessage.AckNack == false {
 		// FenixTestDataSyncServer couldn't handle gPRC call
-		if returnMessage.AckNack == false {
-			fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
-				"ID": "1a2a215f-6356-49a5-a7db-e9a9ead2fe6e",
-				"Message from FenixTestDataSyncServerObject": returnMessage.Comments,
-			}).Error("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendTestDataHeaders'")
-		}
+		fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+			"ID": "1a2a215f-6356-49a5-a7db-e9a9ead2fe6e",
+			"Message from FenixTestDataSyncServerObject": returnMessage.Comments,
+		}).Error("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendTestDataHeaders'")
 	}
 
 }
@@ -419,15 +415,14 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 		fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
 			"ID":    "5644eeb0-7e95-4b42-ae2a-1fafdf926f9d",
 			"error": err,
-		}).Fatal("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendTestDataHeaders'")
+		}).Error("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendTestDataHeaders'")
 
+	} else if returnMessage.AckNack == false {
 		// FenixTestDataSyncServer couldn't handle gPRC call
-		if returnMessage.AckNack == false {
-			fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
-				"ID": "3902e0d2-d28a-40e4-8aa8-553d31ac3b78",
-				"Message from FenixTestDataSyncServerObject": returnMessage.Comments,
-			}).Error("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendTestDataHeaders'")
-		}
+		fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+			"ID": "3902e0d2-d28a-40e4-8aa8-553d31ac3b78",
+			"Message from FenixTestDataSyncServerObject": returnMessage.Comments,
+		}).Error("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendTestDataHeaders'")
 	}
 
 }
@@ -523,15 +518,14 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 		fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
 			"ID":    "b457b233-41f9-4b3d-9f1e-00782b467045",
 			"error": err,
-		}).Fatal("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendTestDataRows'")
+		}).Error("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendTestDataRows'")
 
+	} else if returnMessage.AckNack == false {
 		// FenixTestDataSyncServer couldn't handle gPRC call
-		if returnMessage.AckNack == false {
-			fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
-				"ID": "c1f6a351-fb7e-4759-81a7-04ec61b74e59",
-				"Message from FenixTestDataSyncServerObject": returnMessage.Comments,
-			}).Error("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendTestDataRows'")
-		}
+		fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+			"ID": "c1f6a351-fb7e-4759-81a7-04ec61b74e59",
+			"Message from FenixTestDataSyncServerObject": returnMessage.Comments,
+		}).Error("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendTestDataRows'")
 	}
 
 }
@@ -559,15 +553,14 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 		fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
 			"ID":    "818aaf0b-4112-4be4-97b9-21cc084c7b8b",
 			"error": err,
-		}).Fatal("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendTestDataRows'")
+		}).Error("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendTestDataRows'")
 
+	} else if returnMessage.AckNack == false {
 		// FenixTestDataSyncServer couldn't handle gPRC call
-		if returnMessage.AckNack == false {
-			fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
-				"ID": "2ecbc800-2fb6-4e88-858d-a421b61c5529",
-				"Message from FenixTestDataSyncServerObject": returnMessage.Comments,
-			}).Error("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendTestDataRows'")
-		}
+		fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+			"ID": "2ecbc800-2fb6-4e88-858d-a421b61c5529",
+			"Message from FenixTestDataSyncServerObject": returnMessage.Comments,
+		}).Error("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendTestDataRows'")
 	}
 
 	return returnMessage.AckNack, returnMessage.Comments
