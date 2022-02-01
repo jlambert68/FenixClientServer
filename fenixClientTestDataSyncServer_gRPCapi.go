@@ -20,7 +20,7 @@ func (s *FenixClientTestDataGrpcServicesServer) AreFenixTestDataSyncServerAlive(
 
 	serverStatus, serverMessage := fenixClientTestDataSyncServerObject.SendAreYouAliveToFenixTestDataServer()
 
-	return &fenixClientTestDataSyncServerGrpcApi.AckNackResponse{Acknack: serverStatus, Comments: "Server said to me: " + serverMessage}, nil
+	return &fenixClientTestDataSyncServerGrpcApi.AckNackResponse{AckNack: serverStatus, Comments: "Server said to me: " + serverMessage}, nil
 }
 
 // *********************************************************************
@@ -35,7 +35,7 @@ func (s *FenixClientTestDataGrpcServicesServer) AreYouAlive(ctx context.Context,
 		"id": "9c7f0c3d-7e9f-4c91-934e-8d7a22926d84",
 	}).Debug("Outgoing 'AreYouAlive'")
 
-	return &fenixClientTestDataSyncServerGrpcApi.AckNackResponse{Acknack: true, Comments: "I'am alive, from Client"}, nil
+	return &fenixClientTestDataSyncServerGrpcApi.AckNackResponse{AckNack: true, Comments: "I'am alive, from Client"}, nil
 }
 
 // *********************************************************************
@@ -53,7 +53,7 @@ func (s *FenixClientTestDataGrpcServicesServer) SendMerkleHash(ctx context.Conte
 	// Send MerkleHash to Fenix after sending return message back to caller
 	fenixClientTestDataSyncServerObject.SendMerkleHash()
 
-	return &fenixClientTestDataSyncServerGrpcApi.AckNackResponse{Acknack: true, Comments: ""}, nil
+	return &fenixClientTestDataSyncServerGrpcApi.AckNackResponse{AckNack: true, Comments: ""}, nil
 }
 
 // *********************************************************************
@@ -71,7 +71,7 @@ func (s *FenixClientTestDataGrpcServicesServer) SendMerkleTree(ctx context.Conte
 	// Send MerkleTree to Fenix after sending return message back to caller
 	defer fenixClientTestDataSyncServerObject.SendMerkleTree()
 
-	return &fenixClientTestDataSyncServerGrpcApi.AckNackResponse{Acknack: true, Comments: ""}, nil
+	return &fenixClientTestDataSyncServerGrpcApi.AckNackResponse{AckNack: true, Comments: ""}, nil
 }
 
 // *********************************************************************
@@ -89,7 +89,7 @@ func (s *FenixClientTestDataGrpcServicesServer) SendTestDataHeaderHash(ctx conte
 	// Send TestDataHeaderHash to Fenix after sending return message back to caller
 	defer fenixClientTestDataSyncServerObject.SendTestDataHeaderHash()
 
-	return &fenixClientTestDataSyncServerGrpcApi.AckNackResponse{Acknack: true, Comments: ""}, nil
+	return &fenixClientTestDataSyncServerGrpcApi.AckNackResponse{AckNack: true, Comments: ""}, nil
 }
 
 // *********************************************************************
@@ -107,7 +107,7 @@ func (s *FenixClientTestDataGrpcServicesServer) SendTestDataHeaders(ctx context.
 	// Send TestDataHeaders to Fenix after sending return message back to caller
 	defer fenixClientTestDataSyncServerObject.SendTestDataHeaders()
 
-	return &fenixClientTestDataSyncServerGrpcApi.AckNackResponse{Acknack: true, Comments: ""}, nil
+	return &fenixClientTestDataSyncServerGrpcApi.AckNackResponse{AckNack: true, Comments: ""}, nil
 }
 
 // *********************************************************************
@@ -126,7 +126,7 @@ func (s *FenixClientTestDataGrpcServicesServer) SendTestDataRows(ctx context.Con
 	//TODO Implement the following outgoing function
 	//defer fenixClientTestDataSyncServerObject.SendTestDataRows()
 
-	return &fenixClientTestDataSyncServerGrpcApi.AckNackResponse{Acknack: true, Comments: ""}, nil
+	return &fenixClientTestDataSyncServerGrpcApi.AckNackResponse{AckNack: true, Comments: ""}, nil
 }
 
 // *********************************************************************
@@ -144,7 +144,7 @@ func (s *FenixClientTestDataGrpcServicesServer) SendAllTestDataRows(ctx context.
 	// Send TestDataRows to Fenix after sending return message back to caller
 	defer fenixClientTestDataSyncServerObject.SendAllTestDataRows()
 
-	return &fenixClientTestDataSyncServerGrpcApi.AckNackResponse{Acknack: true, Comments: ""}, nil
+	return &fenixClientTestDataSyncServerGrpcApi.AckNackResponse{AckNack: true, Comments: ""}, nil
 }
 
 // Fenix client can register itself with the Fenix Testdata sync server
@@ -161,7 +161,7 @@ func (s *FenixClientTestDataGrpcServicesServer) RegisterTestDataClient(ctx conte
 	// Send Client registration to Fenix after sending return message back to caller
 	defer fenixClientTestDataSyncServerObject.SendMerkleHash()
 
-	return &fenixClientTestDataSyncServerGrpcApi.AckNackResponse{Acknack: true, Comments: ""}, nil
+	return &fenixClientTestDataSyncServerGrpcApi.AckNackResponse{AckNack: true, Comments: ""}, nil
 }
 
 /*
