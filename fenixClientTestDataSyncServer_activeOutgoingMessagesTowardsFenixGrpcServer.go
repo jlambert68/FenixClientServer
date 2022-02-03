@@ -2,12 +2,14 @@ package main
 
 import (
 	"FenixClientServer/common_config"
+	"crypto/tls"
 	"github.com/go-gota/gota/dataframe"
 	fenixClientTestDataSyncServerGrpcApi "github.com/jlambert68/FenixGrpcApi/Client/fenixClientTestDataSyncServerGrpcApi/go_grpc_api"
 	fenixTestDataSyncServerGrpcApi "github.com/jlambert68/FenixGrpcApi/Fenix/fenixTestDataSyncServerGrpcApi/go_grpc_api"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"log"
 	"os"
 )
@@ -18,21 +20,28 @@ import (
 func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) SetConnectionToFenixTestDataSyncServer() {
 
 	var err error
-	//TODO fixa så att man får en automatisk kontroll av Servers placering local/GCP
-	// If Fenix TestData-server runs on GCP then
-	/*
+	var opts []grpc.DialOption
+
+	//When running on GCP then use credential otherwise not
+	if common_config.ExecutionLocationForFenixTestDataServer == common_config.GCP {
 		creds := credentials.NewTLS(&tls.Config{
 			InsecureSkipVerify: true,
 		})
 
-		opts := []grpc.DialOption{
+		opts = []grpc.DialOption{
 			grpc.WithTransportCredentials(creds),
 		}
+	}
 
-
-	*/
 	// Set up connection to FenixTestDataSyncServer
-	remoteFenixTestDataSyncServerConnection, err = grpc.Dial(fenixTestDataSyncServer_address_to_dial, grpc.WithInsecure()) //opts...)
+	// When run on GCP, use credentials
+	if common_config.ExecutionLocationForFenixTestDataServer == common_config.GCP {
+		// Run on GCP
+		remoteFenixTestDataSyncServerConnection, err = grpc.Dial(fenixTestDataSyncServer_address_to_dial, opts...)
+	} else {
+		// Run Local
+		remoteFenixTestDataSyncServerConnection, err = grpc.Dial(fenixTestDataSyncServer_address_to_dial, grpc.WithInsecure())
+	}
 	if err != nil {
 		fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
 			"fenixTestDataSyncServer_address_to_dial": fenixTestDataSyncServer_address_to_dial,
@@ -198,8 +207,8 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 		TestDataClientUuid:           common_config.FenicClientTestDataSyncServer_TestDataClientUuid,
 		TestDomainUuid:               common_config.FenicClientTestDataSyncServer_DomainUuid,
 		TestDomainName:               common_config.FenicClientTestDataSyncServer_DomainName,
-		TestDataClientIpAddress:      common_config.FenixClientTestDataSyncServer_address,
-		TestDataClientPort:           string(rune(common_config.FenixClientTestDataSyncServer_initial_port)),
+		TestDataClientIpAddress:      common_config.ClientTestDataSyncServerAddress,
+		TestDataClientPort:           string(rune(common_config.ClientTestDataSyncServerPort)),
 		ProtoFileVersionUsedByClient: fenixTestDataSyncServerGrpcApi.CurrentFenixTestDataProtoFileVersionEnum(fenixClientTestDataSyncServerObject.getHighestFenixProtoFileVersion()),
 	}
 

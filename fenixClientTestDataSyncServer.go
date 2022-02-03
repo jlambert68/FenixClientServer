@@ -1,12 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
-
 	"github.com/sirupsen/logrus"
 )
 
@@ -38,33 +32,10 @@ func FenixClientServer_main() {
 	// Init logger
 	fenixClientTestDataSyncServerObject.InitLogger("")
 
-	// Celan up when leaving. Is placed after logger because shutdown logs information
-	//defer cleanup()
+	// Clean up when leaving. Is placed after logger because shutdown logs information
+	defer cleanup()
 
 	// Start Backend gRPC-server
 	fenixClientTestDataSyncServerObject.InitGrpcServer()
 
-	// Register at QML Server
-	// TODO Detta ska inte göras. Denna komponent ska vara passiv
-	//fenixClientTestDataSyncServerObject.SendMQmlServerIpAndPortForBackendServer()
-
-	c := make(chan os.Signal, 2)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-	go func() {
-		<-c
-		cleanup()
-		os.Exit(0)
-	}()
-
-	//for {
-	fmt.Println("sleeping...for another 3 second 5 minutes")
-	time.Sleep(3 * time.Second) // or runtime.Gosched() or similar per @misterbee
-	//}
-
-	//Wait until user exit
-	/*
-		   for {
-			   time.Sleep(10)
-		   }
-	*/
 }

@@ -1,13 +1,11 @@
 package main
 
 import (
-	"FenixClientServer/common_config"
 	fenixClientTestDataSyncServerGrpcApi "github.com/jlambert68/FenixGrpcApi/Client/fenixClientTestDataSyncServerGrpcApi/go_grpc_api"
 	fenixTestDataSyncServerGrpcApi "github.com/jlambert68/FenixGrpcApi/Fenix/fenixTestDataSyncServerGrpcApi/go_grpc_api"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"net"
-	"strconv"
 	//	ecpb "github.com/jlambert68/FenixGrpcApi/Client/fenixTestDataSyncServerGrpcApi/echo/go_grpc_api"
 )
 
@@ -18,7 +16,7 @@ type fenixClientTestDataSyncServerObject_struct struct {
 var fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct
 
 // Global connection constants
-var localServerEngineLocalPort = common_config.FenixClientTestDataSyncServer_initial_port
+//var localServerEngineLocalPort int
 
 var (
 	registerfenixClientTestDataSyncServerServer *grpc.Server
@@ -30,7 +28,7 @@ var (
 	remoteFenixTestDataSyncServerConnection *grpc.ClientConn
 	gRpcClientForFenixTestDataSyncServer    fenixTestDataSyncServerGrpcApi.FenixTestDataGrpcServicesClient
 
-	fenixTestDataSyncServer_address_to_dial string = common_config.FenixTestDataSyncServer_address + ":" + strconv.Itoa(common_config.FenixTestDataSyncServer_port)
+	fenixTestDataSyncServer_address_to_dial string
 
 	fenixTestDataSyncServerClient fenixTestDataSyncServerGrpcApi.FenixTestDataGrpcServicesClient
 )

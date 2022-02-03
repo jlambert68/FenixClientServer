@@ -24,5 +24,7 @@ Add data/ data/
 ENTRYPOINT ["/fenixClientServer"]
 
 #// docker build -t  fenix-client-server .
-#// docker run -p 5998:5998 -it  fenix-client-server -startupType=LOCALHOST_DOCKER
+#// docker run -p 5998:5998 -it  fenix-client-server
+#// docker run -p 5998:5998 -it --env StartupType=LOCALHOST_DOCKER fenix-client-server
+
 #//docker run --name fenix-client-server --rm -i -t fenix-client-server  bash

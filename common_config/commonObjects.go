@@ -1,18 +1,42 @@
 package common_config
 
-// Used as command flags when starting up to decide from where it was started
-var StartUpType StartUpTypeType
+// The following variables receives their values from environment variables
 
-type StartUpTypeType int
+// Where is the client running
+var ExecutionLocationForClient ExecutionLocationTypeType
 
+// Where is the Fenix TestDataSync server running
+// LocationForFenixTestDataServer
+var ExecutionLocationForFenixTestDataServer ExecutionLocationTypeType
+
+// Definitions for where client and Fenix Server is running
+type ExecutionLocationTypeType int
+
+// Constants used for where stuff is running
 const (
-	LocalhostNodocker StartUpTypeType = iota
+	LocalhostNoDocker ExecutionLocationTypeType = iota
 	LocalhostDocker
 	GCP
 )
 
-var StartUpTypeMapping = map[StartUpTypeType]string{
-	LocalhostNodocker: "LOCALHOST_NODOCKER",
+// Client
+var LocationForClientTypeMapping = map[ExecutionLocationTypeType]string{
+	LocalhostNoDocker: "LOCALHOST_NODOCKER",
 	LocalhostDocker:   "LOCALHOST_DOCKER",
 	GCP:               "GCP",
 }
+
+// Fenix Server
+var LocationForFenixTestDataServerTypeMapping = map[ExecutionLocationTypeType]string{
+	LocalhostNoDocker: "LOCALHOST_NODOCKER",
+	LocalhostDocker:   "LOCALHOST_DOCKER",
+	GCP:               "GCP",
+}
+
+// Address to Fenix TestData Server & Client, will have their values from Environment variables at startup
+var (
+	FenixTestDataSyncServerAddress  string
+	FenixTestDataSyncServerPort     int
+	ClientTestDataSyncServerAddress string
+	ClientTestDataSyncServerPort    int
+)
