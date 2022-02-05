@@ -112,7 +112,7 @@ func (s *FenixClientTestDataGrpcServicesServer) SendTestDataHeaders(ctx context.
 
 // *********************************************************************
 // Fenix client can send TestData rows to Fenix Testdata sync server with this service
-func (s *FenixClientTestDataGrpcServicesServer) SendTestDataRows(ctx context.Context, merkleTreeMessage *fenixClientTestDataSyncServerGrpcApi.MerklePathsMessage) (*fenixClientTestDataSyncServerGrpcApi.AckNackResponse, error) {
+func (s *FenixClientTestDataGrpcServicesServer) SendTestDataRows(ctx context.Context, merklePathsMessage *fenixClientTestDataSyncServerGrpcApi.MerklePathsMessage) (*fenixClientTestDataSyncServerGrpcApi.AckNackResponse, error) {
 
 	fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
 		"id": "2b1c8752-eb84-4c15-b8a7-22e2464e5168",
@@ -122,9 +122,8 @@ func (s *FenixClientTestDataGrpcServicesServer) SendTestDataRows(ctx context.Con
 		"id": "755e8b4f-f184-4277-ad41-e041714c2ca8",
 	}).Debug("Outgoing 'SendTestDataRows'")
 
-	// Send TestDataRows to Fenix after sending return message back to caller
-	//TODO Implement the following outgoing function
-	//defer fenixClientTestDataSyncServerObject.SendTestDataRows()
+	// Send requested TestDataRows to Fenix after sending return message back to caller
+	defer fenixClientTestDataSyncServerObject.SendTestDataRows(merklePathsMessage.MerklePath)
 
 	return &fenixClientTestDataSyncServerGrpcApi.AckNackResponse{AckNack: true, Comments: ""}, nil
 }
@@ -141,8 +140,8 @@ func (s *FenixClientTestDataGrpcServicesServer) SendAllTestDataRows(ctx context.
 		"id": "7bc8a6bd-8d8e-4244-98bf-cd5ca686d3f2",
 	}).Debug("Outgoing 'SendTestDataRows'")
 
-	// Send TestDataRows to Fenix after sending return message back to caller
-	defer fenixClientTestDataSyncServerObject.SendAllTestDataRows()
+	// Send all TestDataRows to Fenix after sending return message back to caller
+	defer fenixClientTestDataSyncServerObject.SendTestDataRows([]string{})
 
 	return &fenixClientTestDataSyncServerGrpcApi.AckNackResponse{AckNack: true, Comments: ""}, nil
 }

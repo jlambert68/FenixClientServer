@@ -1,5 +1,6 @@
 package common_config
 
+// ***********************************************************************************************************
 // The following variables receives their values from environment variables
 
 // Where is the client running
@@ -40,3 +41,5 @@ var (
 	ClientTestDataSyncServerAddress string
 	ClientTestDataSyncServerPort    int
 )
+
+// ***********************************************************************************************************
