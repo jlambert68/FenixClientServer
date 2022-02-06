@@ -363,3 +363,32 @@ func ExtractMerkleRootHashFromMerkleTree(merkleTree dataframe.DataFrame) (merkle
 
 	return merkleRootHash
 }
+
+// Extract all MerkleFIlterCOlumns from a MerkleFilterPath
+func ExtractValuesFromFilterPath(merklFilterPath string) (merkleFilterColumns []string) {
+
+	startPosition := 0
+
+	for {
+
+		endPosition := strings.Index(merklFilterPath, "/")
+
+		// Check if we found end of Tree
+		if endPosition == -1 {
+			// return all columns
+
+			return merkleFilterColumns
+		}
+
+		// Extract the Column and add to array, if it's not the 'MerkleRoot'
+		merklePathColumn := merklFilterPath[startPosition:endPosition]
+
+		if merklePathColumn != "MerkleRoot" {
+			merkleFilterColumns = append(merkleFilterColumns, merklePathColumn)
+		}
+
+		// Remove extracted values from path
+		merklFilterPath = merklFilterPath[endPosition+1:]
+
+	}
+}

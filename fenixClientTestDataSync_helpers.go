@@ -2,13 +2,78 @@ package main
 
 import (
 	"FenixClientServer/common_config"
+	"fmt"
 	"github.com/go-gota/gota/dataframe"
+	"github.com/go-gota/gota/series"
 	fenixTestDataSyncServerGrpcApi "github.com/jlambert68/FenixGrpcApi/Fenix/fenixTestDataSyncServerGrpcApi/go_grpc_api"
 	"log"
 	"os"
 )
 
-func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) CreateRowsMessage(merklePaths []string) (testdataRowsMessages *fenixTestDataSyncServerGrpcApi.TestdataRowsMessages) {
+// Filter out the rows that server requested, all rows if server didn't request specific rows
+func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) filterOutRequestedTestDataRows(merklePaths []string, testDataToWorkWith *dataframe.DataFrame) {
+
+	// Only filter rows when there are MerklePaths to filter on
+	if len(merklePaths) == 0 {
+		return
+	}
+
+	// Extract all headers, to be used for joining dataframes
+	headerKeys := testDataToWorkWith.Names()
+
+	// Create an "Empty version of the TestData dataframe
+	//localTestDataCopy := testDataToWorkWith.Copy().Subset(0)
+	localTestDataCopy := testDataToWorkWith.Filter(
+		dataframe.F{
+			Colname:    headerKeys[0],
+			Comparator: series.Eq,
+			Comparando: -999,
+		})
+
+	// Loop all merklePaths
+	for _, merklPath := range merklePaths {
+
+		// Create a temporary working copy of the testdata to work with
+		localTempTestDataCopy := testDataToWorkWith.Copy()
+
+		// Add Column to be used as filter
+		numberOfRows := localTempTestDataCopy.Nrow()
+
+		localTempTestDataCopy = localTempTestDataCopy.Mutate(
+			series.New(make([]bool, numberOfRows), series.Bool, "FilterColumn"))
+
+		// Extract all 'columns' from merkleFilterPath
+		merkleFilterColumns := common_config.ExtractValuesFromFilterPath(merkleFilterPath)
+
+		// Extract values to filter on, sent by Fenix TestData server
+		merkleFilterValues := common_config.ExtractValuesFromFilterPath(merklPath)
+
+		fmt.Println(merkleFilterColumns)
+		fmt.Println(merkleFilterValues)
+
+		// Loop over the MerkleFilterValues and filter the TestData
+		for filterValueCounter, filterValue := range merkleFilterValues {
+			// Filter out the leaf nodes
+			localTempTestDataCopy = localTempTestDataCopy.Filter(
+				dataframe.F{
+					Colname:    merkleFilterColumns[filterValueCounter],
+					Comparator: series.Eq,
+					Comparando: filterValue,
+				})
+		}
+
+		// Add the Rows that were the resulter after filtering
+		localTestDataCopy = localTestDataCopy.OuterJoin(localTempTestDataCopy, headerKeys...)
+
+	}
+
+	// Return the rows
+	testDataToWorkWith = &localTestDataCopy
+
+}
+
+// Create the TestData rows to be sent to Fenix TestData Server
+func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) createRowsMessage(merklePaths []string) (testdataRowsMessages *fenixTestDataSyncServerGrpcApi.TestdataRowsMessages) {
 
 	var testdataRows []*fenixTestDataSyncServerGrpcApi.TestDataRowMessage
 	var testDataRowMessage *fenixTestDataSyncServerGrpcApi.TestDataRowMessage
@@ -17,7 +82,7 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 	var testDataItemValueAsString string
 
 	// Load Testdata file
-	irisCsv, err := os.Open("data/FenixRawTestdata_14rows_211216.csv")
+	irisCsv, err := os.Open(testFile)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -26,6 +91,9 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 	df := dataframe.ReadCSV(irisCsv,
 		dataframe.WithDelimiter(';'),
 		dataframe.HasHeader(true))
+
+	// Filter out to only have requested rows
+	fenixClientTestDataSyncServerObject.filterOutRequestedTestDataRows(merklePaths, &df)
 
 	numberOfColumnsToProcess := df.Ncol()
 	numberOfRows := df.Nrow()

@@ -440,7 +440,7 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) SendTestDataRows(merklePaths []string) {
 
 	// Create the message with all test data to be sent to Fenix
-	testdataRowsMessages := fenixClientTestDataSyncServerObject.CreateRowsMessage([]string{})
+	testdataRowsMessages := fenixClientTestDataSyncServerObject.createRowsMessage(merklePaths)
 
 	// Set up connection to Server
 	fenixClientTestDataSyncServerObject.SetConnectionToFenixTestDataSyncServer()

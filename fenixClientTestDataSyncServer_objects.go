@@ -42,8 +42,9 @@ type FenixClientTestDataGrpcServicesServer struct {
 // For now hardcoded MerklePath
 var merkleFilterPath string = "AccountEnvironment/ClientJuristictionCountryCode/MarketSubType/MarketName/" //SecurityType/"
 
-//var testFile = "data/FenixRawTestdata_14rows_211216.csv"
-var testFile = "data/FenixRawTestdata_14rows_211216_change.csv"
+var testFile = "data/FenixRawTestdata_14rows_211216.csv"
+
+//var testFile = "data/FenixRawTestdata_14rows_211216_change.csv"
 
 var highestFenixProtoFileVersion int32 = -1
 var highestClientProtoFileVersion int32 = -1
