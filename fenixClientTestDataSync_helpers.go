@@ -6,6 +6,7 @@ import (
 	"github.com/go-gota/gota/dataframe"
 	"github.com/go-gota/gota/series"
 	fenixTestDataSyncServerGrpcApi "github.com/jlambert68/FenixGrpcApi/Fenix/fenixTestDataSyncServerGrpcApi/go_grpc_api"
+	"github.com/sirupsen/logrus"
 	"log"
 	"os"
 )
@@ -37,10 +38,10 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 		localTempTestDataCopy := testDataToWorkWith.Copy()
 
 		// Add Column to be used as filter
-		numberOfRows := localTempTestDataCopy.Nrow()
+		//numberOfRows := localTempTestDataCopy.Nrow()
 
-		localTempTestDataCopy = localTempTestDataCopy.Mutate(
-			series.New(make([]bool, numberOfRows), series.Bool, "FilterColumn"))
+		//localTempTestDataCopy = localTempTestDataCopy.Mutate(
+		//	series.New(make([]bool, numberOfRows), series.Bool, "FilterColumn"))
 
 		// Extract all 'columns' from merkleFilterPath
 		merkleFilterColumns := common_config.ExtractValuesFromFilterPath(merkleFilterPath)
@@ -62,13 +63,13 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 				})
 		}
 
-		// Add the Rows that were the resulter after filtering
+		// Add the Rows that were the result after filtering
 		localTestDataCopy = localTestDataCopy.OuterJoin(localTempTestDataCopy, headerKeys...)
 
 	}
 
 	// Return the rows
-	testDataToWorkWith = &localTestDataCopy
+	*testDataToWorkWith = localTestDataCopy
 
 }
 
@@ -91,6 +92,16 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 	df := dataframe.ReadCSV(irisCsv,
 		dataframe.WithDelimiter(';'),
 		dataframe.HasHeader(true))
+
+	fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+		"id": "737745ca-8b5b-4b35-9943-19b036cdb5a6",
+	}).Debug("Read file: ", testFile)
+
+	merkleHash, _, _ := common_config.LoadAndProcessFile(testFile)
+
+	fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+		"id": "ba09fb6a-52e1-4d26-8e71-3e600f4460eb",
+	}).Debug("MerkleHash for Read file: ", merkleHash)
 
 	// Filter out to only have requested rows
 	fenixClientTestDataSyncServerObject.filterOutRequestedTestDataRows(merklePaths, &df)
