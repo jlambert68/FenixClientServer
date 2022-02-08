@@ -1,6 +1,8 @@
 package common_config
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	fenixTestDataSyncServerGrpcApi "github.com/jlambert68/FenixGrpcApi/Fenix/fenixTestDataSyncServerGrpcApi/go_grpc_api"
 )
 
@@ -41,4 +43,15 @@ func CreateTestDataHeaderItemMessageHash(testDataHeaderItemMessage *fenixTestDat
 	testDataHeaderItemMessageHash = HashValues(valuesToHash, true)
 
 	return testDataHeaderItemMessageHash
+}
+
+// Hash a single value
+func HashSingleValue(valueToHash string) (hashValue string) {
+
+	hash := sha256.New()
+	hash.Write([]byte(valueToHash))
+	hashValue = hex.EncodeToString(hash.Sum(nil))
+
+	return hashValue
+
 }

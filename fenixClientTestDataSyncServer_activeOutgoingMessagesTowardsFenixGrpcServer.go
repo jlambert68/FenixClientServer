@@ -239,12 +239,14 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) SendMerkleHash() {
 
 	merkleRootHash, _, _ := common_config.LoadAndProcessFile(testFile)
+	merkleFilterPathHash := common_config.HashSingleValue(merkleFilterPath)
 
 	// Set up variables to be sent to FenixTestDataSyncServer
 	merkleHashMessage := fenixTestDataSyncServerGrpcApi.MerkleHashMessage{
 		TestDataClientUuid: common_config.FenicClientTestDataSyncServer_TestDataClientUuid,
 		MerkleHash:         merkleRootHash,
 		MerkleFilter:       merkleFilterPath,
+		MerkleFilterHash:   merkleFilterPathHash,
 		ProtoFileVersionUsedByClient: fenixTestDataSyncServerGrpcApi.CurrentFenixTestDataProtoFileVersionEnum(
 			fenixClientTestDataSyncServerObject.getHighestFenixProtoFileVersion()),
 	}
