@@ -3,7 +3,6 @@ package common_config
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"fmt"
 	"github.com/go-gota/gota/series"
 	"log"
 	"os"
@@ -92,7 +91,7 @@ func hashChildrenAndWriteToDataStore(level int, currentMerklePath string, values
 			series.New([]int{level}, series.Int, "MerkleLevel"),
 			series.New([]string{currentMerklePath}, series.String, "MerkleName"),
 			series.New([]string{MerkleHash}, series.String, "MerkleHash"),
-			series.New([]string{MerkleHash}, series.String, "MerkleChildHash"),
+			series.New([]string{MerkleHash}, series.String, "MerkleChildHash"), // Correct to use 'MerkleHash'
 			series.New([]string{currentMerkleFilterPath}, series.String, "MerkleFilterPath"),
 		)
 
@@ -108,7 +107,7 @@ func hashChildrenAndWriteToDataStore(level int, currentMerklePath string, values
 				series.New([]string{currentMerklePath}, series.String, "MerkleName"),
 				series.New([]string{MerkleHash}, series.String, "MerkleHash"),
 				series.New([]string{rowHashValue}, series.String, "MerkleChildHash"),
-				series.New([]string{currentMerklePath}, series.String, "MerkleFilterPath"),
+				series.New([]string{currentMerkleFilterPath}, series.String, "MerkleFilterPath"),
 			)
 			tempDF := merkleTreeDataFrame.RBind(newRowDataFrame)
 			merkleTreeDataFrame = tempDF
@@ -122,7 +121,7 @@ func hashChildrenAndWriteToDataStore(level int, currentMerklePath string, values
 
 func recursiveTreeCreator(level int, currentMerkleFilterPath string, dataFrameToWorkOn dataframe.DataFrame, currentMerklePath string) (string, string) {
 
-	var merkleFilterPath string
+	var merkleFilterPathToBeReturned string
 	var localMerkleHash string
 
 	level = level + 1
@@ -139,10 +138,13 @@ func recursiveTreeCreator(level int, currentMerkleFilterPath string, dataFrameTo
 		// Hash all row - hashes into one hash
 		valuesToHash := uniqueGotaSeriesAsStringArray(dataFrameToWorkOn.Col("TestDataHash"))
 
-		// Hash and store
-		MerkleHash := hashChildrenAndWriteToDataStore(level, currentMerklePath, valuesToHash, true, merkleFilterPath)
+		// Set merkleFilterPath at LeadNode-level
+		merkleFilterPathToBeReturned = "AccountEnvironment/ClientJuristictionCountryCode/MarketSubType/MarketName/" //TODO Use same source
 
-		return MerkleHash, "AccountEnvironment/ClientJuristictionCountryCode/MarketSubType/MarketName/" //TODO Use same source
+		// Hash and store
+		MerkleHash := hashChildrenAndWriteToDataStore(level, currentMerklePath, valuesToHash, true, merkleFilterPathToBeReturned)
+
+		return MerkleHash, merkleFilterPathToBeReturned
 
 	} else {
 		// Get merklePathlabel
@@ -165,7 +167,7 @@ func recursiveTreeCreator(level int, currentMerkleFilterPath string, dataFrameTo
 				})
 
 			// Recursive call to get next level, if there is one
-			localMerkleHash, merkleFilterPath = recursiveTreeCreator(level, currentMerkleFilterPath, newFilteredDataFrame, currentMerklePath+uniqueValue+"/")
+			localMerkleHash, merkleFilterPathToBeReturned = recursiveTreeCreator(level, currentMerkleFilterPath, newFilteredDataFrame, currentMerklePath+uniqueValue+"/")
 
 			if len(localMerkleHash) != 0 {
 				valuesToHash = append(valuesToHash, localMerkleHash)
@@ -173,25 +175,25 @@ func recursiveTreeCreator(level int, currentMerkleFilterPath string, dataFrameTo
 				log.Fatalln("We are at the end node - **** Should never happened ****")
 			}
 
-			// Verify that 'merkleFilterPath' is ending with a '/'
-			if strings.HasSuffix(merkleFilterPath, "/") == false {
-				log.Fatalln("'merkleFilterPath' is not ending with a '/' (42f08984-4b34-4b93-b419-53866994cd90)"))
-			}
-
-			// Remove last "Filter column" from 'merkleFilterPath'
-			merkleFilterPath = merkleFilterPath[:len(merkleFilterPath)-1]
-			position := strings.LastIndex(merkleFilterPath, "/")
-
-			merkleFilterPath = merkleFilterPath[:position]
-
 		}
 
+		// Verify that 'merkleFilterPathToBeReturned' is ending with a '/'
+		if strings.HasSuffix(merkleFilterPathToBeReturned, "/") == false {
+			log.Fatalln("'merkleFilterPathToBeReturned' is not ending with a '/' (42f08984-4b34-4b93-b419-53866994cd90)")
+		}
+
+		// Remove last "Filter column" from 'merkleFilterPathToBeReturned'
+		merkleFilterPathToBeReturned = merkleFilterPathToBeReturned[:len(merkleFilterPathToBeReturned)-1]
+		position := strings.LastIndex(merkleFilterPathToBeReturned, "/")
+
+		merkleFilterPathToBeReturned = merkleFilterPathToBeReturned[:position+1]
+
 		// Add MerkleHash and nodes to table
-		merkleHash := hashChildrenAndWriteToDataStore(level, currentMerklePath, valuesToHash, false, merkleFilterPath)
-		return merkleHash, merkleFilterPath
+		merkleHash := hashChildrenAndWriteToDataStore(level, currentMerklePath, valuesToHash, false, merkleFilterPathToBeReturned)
+		return merkleHash, merkleFilterPathToBeReturned
 
 	}
-	return "", merkleFilterPath
+	return "", merkleFilterPathToBeReturned
 }
 
 // Dataframe holding original File's MerkleTree
@@ -245,7 +247,7 @@ func LoadAndProcessFile(fileToprocess string) (string, dataframe.DataFrame, data
 
 	merkleFilterPath := "AccountEnvironment/ClientJuristictionCountryCode/MarketSubType/MarketName/" //SecurityType/"
 
-	merkleHash := recursiveTreeCreator(0, merkleFilterPath, df, "MerkleRoot/")
+	merkleHash, _ := recursiveTreeCreator(0, merkleFilterPath, df, "MerkleRoot/")
 
 	return merkleHash, merkleTreeDataFrame, df
 }

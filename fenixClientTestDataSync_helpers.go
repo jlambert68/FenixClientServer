@@ -9,6 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"log"
 	"os"
+	"strings"
 )
 
 // Filter out the rows that server requested, all rows if server didn't request specific rows
@@ -103,6 +104,65 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 		"id": "ba09fb6a-52e1-4d26-8e71-3e600f4460eb",
 	}).Debug("MerkleHash for Read file: ", merkleHash)
 
+	// Extract each FilterPathValues into an array
+	var merkleFilterValues []string
+	merkleFilterPath := "AccountEnvironment/ClientJuristictionCountryCode/MarketSubType/MarketName/" //TODO use same source
+	startPosition := 0
+
+	for {
+		endPosition := strings.Index(merkleFilterPath, "/")
+
+		// If no more '/' then exit for loop
+		if endPosition == -1 {
+			break
+		}
+
+		merklePathValue := merkleFilterPath[startPosition:endPosition]
+		merkleFilterValues = append(merkleFilterValues, merklePathValue)
+		merkleFilterPath = merkleFilterPath[endPosition+1:]
+
+	}
+
+	// List all Headers
+	headerNames := df.Names()
+
+	// Create Map over 'merkleFilterValue' -> Column-number
+	merkleFilterValueToColumnNumberMap := make(map[string]int) //map[<merkleFilterValue>]=<Column number>
+
+	// Loop over MerkleFilterValues and create map
+	for _, merkleFilterValue := range merkleFilterValues {
+
+		// Verify that value doesn't exist
+		_, merkleFilterValueExists := merkleFilterValueToColumnNumberMap[merkleFilterValue]
+
+		if merkleFilterValueExists == true {
+			fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+				"ID":                "56822d4e-f9d8-4591-81fa-5af3f43867ed",
+				"merkleFilterValue": merkleFilterValue,
+			}).Fatal("'merkleFilterValue' already exists in map. This should not happen ")
+		}
+
+		// Loop over Headers to get column number for header, to create the map([merkleFilterValue]=HeaderColumnNumber)
+		var headerFound = false
+		for headerColumnNumber, headerName := range headerNames {
+
+			if headerName == merkleFilterValue {
+				merkleFilterValueToColumnNumberMap[merkleFilterValue] = headerColumnNumber
+				headerFound = true
+				break
+			}
+		}
+
+		// If 'merkleFilterValue' wasn't found among Headers then there is some fishy stuff going on
+		if headerFound == false {
+			fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+				"ID":                "cdb5648a-8d8d-4d4e-9650-b3864b2bd34a",
+				"merkleFilterValue": merkleFilterValue,
+				"headerNames":       headerNames,
+			}).Fatal("'merkleFilterValue' was not found among headers. This should not happen ")
+		}
+	}
+
 	// Filter out to only have requested rows
 	fenixClientTestDataSyncServerObject.filterOutRequestedTestDataRows(merklePaths, &df)
 
@@ -121,15 +181,25 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 			}
 			testdataItems = append(testdataItems, testdataItemMessage)
 			valuesToHash = append(valuesToHash, testDataItemValueAsString)
+
 		}
 
 		// Hash all values for row
 		hashedRow := common_config.HashValues(valuesToHash, true)
 
+		// Create the LeafNodeName
+		var leafNodeName = "MerkleRoot/"
+		for _, columnName := range merkleFilterValues {
+
+			columnNumber := merkleFilterValueToColumnNumberMap[columnName]
+			leafNodeNamePart := df.Elem(rowCounter, columnNumber).String()
+			leafNodeName = leafNodeName + leafNodeNamePart + "/"
+		}
+
 		// Create one row object and add it to array
 		testDataRowMessage = &fenixTestDataSyncServerGrpcApi.TestDataRowMessage{
 			RowHash:       hashedRow,
-			LeafNodeName:  "XXXXX",
+			LeafNodeName:  leafNodeName,
 			LeafNodePath:  merkleFilterPath,
 			TestDataItems: testdataItems,
 		}
