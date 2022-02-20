@@ -83,11 +83,11 @@ func hashChildrenAndWriteToDataStore(level int, currentMerklePath string, values
 
 	MerkleHash := sha256_hash
 
-	// # Add MerkleHash and sub leaf nodes to table if not end node. If End node then only save ref to it self
+	// # Add MerkleHash and sub leaf nodes to table if not end node. If End node then hash its value as reference
 	if isEndLeafNode == true {
 
-		// For LeafNodes the childHash will be calculated by using SHA256(NodeHash)
-		leafNodeChildHash := HashSingleValue(MerkleHash)
+		// For LeafNodes the childHash will be calculated by using SHA256('NodeHash' + 'NodeHash')
+		leafNodeChildHash := HashSingleValue(MerkleHash + MerkleHash)
 
 		// Add row
 		//merkleTreeToUse.loc[merkleTreeToUse.shape[0]] = [level, currentMerklePath, MerkleHash, MerkleHash]
@@ -103,14 +103,14 @@ func hashChildrenAndWriteToDataStore(level int, currentMerklePath string, values
 		merkleTreeDataFrame = tempDF
 
 	} else {
-		for _, rowHashValue := range valuesToHash {
+		for _, nodeHash := range valuesToHash {
 			// Add row
-			//merkleTreeToUse.loc[merkleTreeToUse.shape[0]] = [level, currentMerklePath, MerkleHash, rowHashValue ]
+
 			newRowDataFrame := dataframe.New(
 				series.New([]int{level}, series.Int, "MerkleLevel"),
 				series.New([]string{currentMerklePath}, series.String, "MerkleName"),
 				series.New([]string{MerkleHash}, series.String, "MerkleHash"),
-				series.New([]string{rowHashValue}, series.String, "MerkleChildHash"),
+				series.New([]string{nodeHash}, series.String, "MerkleChildHash"),
 				series.New([]string{currentMerkleFilterPath}, series.String, "MerkleFilterPath"),
 			)
 			tempDF := merkleTreeDataFrame.RBind(newRowDataFrame)

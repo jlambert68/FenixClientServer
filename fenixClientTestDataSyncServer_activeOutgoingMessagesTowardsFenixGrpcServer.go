@@ -9,6 +9,8 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	"log"
+	"os"
 )
 
 // ********************************************************************************************************************
@@ -284,6 +286,14 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 
 	// Set up variables to be sent to FenixTestDataSyncServer
 	_, merkleTree, _ := common_config.LoadAndProcessFile(testFile)
+
+	f, err := os.Create("merklTreeProduced.csv")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	merkleTree.WriteCSV(f)
+	f.Close()
 
 	merkleTreeNRows := merkleTree.Nrow()
 	for rowCounter := 0; rowCounter < merkleTreeNRows; rowCounter++ {

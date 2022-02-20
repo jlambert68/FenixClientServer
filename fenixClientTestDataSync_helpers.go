@@ -106,7 +106,9 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 
 	// Extract each FilterPathValues into an array
 	var merkleFilterValues []string
-	merkleFilterPath := "AccountEnvironment/ClientJuristictionCountryCode/MarketSubType/MarketName/" //TODO use same source
+	merkleFilterPathFull := "AccountEnvironment/ClientJuristictionCountryCode/MarketSubType/MarketName/" //TODO use same source
+	merkleFilterPath := merkleFilterPathFull
+
 	startPosition := 0
 
 	for {
@@ -200,7 +202,7 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 		testDataRowMessage = &fenixTestDataSyncServerGrpcApi.TestDataRowMessage{
 			RowHash:       hashedRow,
 			LeafNodeName:  leafNodeName,
-			LeafNodePath:  merkleFilterPath,
+			LeafNodePath:  merkleFilterPathFull,
 			TestDataItems: testdataItems,
 		}
 		testdataRows = append(testdataRows, testDataRowMessage)
