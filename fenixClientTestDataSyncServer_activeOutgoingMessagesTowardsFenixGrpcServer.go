@@ -3,6 +3,7 @@ package main
 import (
 	"FenixClientServer/common_config"
 	"crypto/tls"
+	"fmt"
 	fenixClientTestDataSyncServerGrpcApi "github.com/jlambert68/FenixGrpcApi/Client/fenixClientTestDataSyncServerGrpcApi/go_grpc_api"
 	fenixTestDataSyncServerGrpcApi "github.com/jlambert68/FenixGrpcApi/Fenix/fenixTestDataSyncServerGrpcApi/go_grpc_api"
 	"github.com/sirupsen/logrus"
@@ -273,6 +274,11 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 			"ID": "fb923a55-136e-481e-9c30-d7d7019e17e3",
 			"Message from FenixTestDataSyncServerObject": returnMessage.Comments,
 		}).Error("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendMerkleHash'")
+	} else {
+		fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+			"ID":         "a9b9578e-4bc7-4ef5-91b6-67a8191a0af5",
+			"MerkleHash": merkleRootHash,
+		}).Debug("Sent MerkleHash to Server")
 	}
 
 }
@@ -449,24 +455,61 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 // ********************************************************************************************************************
 
 // SendTestDataRows - Send the client's TestDataRow to Fenix by calling Fenix's gPRC server
-func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) SendTestDataRows(merklePaths []string) {
+func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) SendTestDataRows(merkleNodeNames []string) {
 
 	// Create the message with all test data to be sent to Fenix
-	testdataRowsMessages := fenixClientTestDataSyncServerObject.createRowsMessage(merklePaths)
+	testdataRowsMessages := fenixClientTestDataSyncServerObject.createRowsMessage(merkleNodeNames)
+
+	// Create the message that will all messages to be in the stream
+	var testdataRowsMessagesStreamContainer []*fenixTestDataSyncServerGrpcApi.TestdataRowsMessages
+	testdataRowsMessagesStreamContainer = append(testdataRowsMessagesStreamContainer, testdataRowsMessages)
 
 	// Set up connection to Server
 	fenixClientTestDataSyncServerObject.SetConnectionToFenixTestDataSyncServer()
 
-	// Do gRPC-call
+	// Set up Stream towards the gRPC-server
 	ctx := context.Background()
-	returnMessage, err := fenixTestDataSyncServerClient.SendTestDataRows(ctx, testdataRowsMessages)
+	//ctx2, _ := context.WithCancel(ctx)
+	//defer cancel()
+	stream, err := fenixTestDataSyncServerClient.SendTestDataRows(ctx)
+	if err != nil {
+		fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+			"ID":    "e5d20ade-539b-4c20-834a-628e131d06be",
+			"error": err,
+		}).Error("Couldn't set up a 'Stream' to gRPC-server ")
+
+		return
+	}
+
+	// Loop all 'testdataRowsMessages' and stream the messages to the gRPC-server
+	for counter, testdataRowsMessages := range testdataRowsMessagesStreamContainer {
+		err = stream.Send(testdataRowsMessages)
+		if err != nil {
+			fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+				"ID":    "4773d81c-f42d-46d5-8d54-86a90c3d717f",
+				"error": err,
+			}).Error("Couldn't send stream-object to gRPC-server ")
+
+			//return
+		}
+		fmt.Println(counter)
+
+	}
+	returnMessage, err := stream.CloseAndRecv()
+
+	// Do gRPC-call
+	//ctx := context.Background()
+	//returnMessage, err := fenixTestDataSyncServerClient.SendTestDataRows(ctx, testdataRowsMessages)
 
 	// Shouldn't happen
 	if err != nil {
 		fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
-			"ID":    "b457b233-41f9-4b3d-9f1e-00782b467045",
-			"error": err,
+			"ID":            "b457b233-41f9-4b3d-9f1e-00782b467045",
+			"error":         err,
+			"returnMessage": returnMessage,
 		}).Error("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendTestDataRows'")
+
+		return
 
 	} else if returnMessage.AckNack == false {
 		// FenixTestDataSyncServer couldn't handle gPRC call
@@ -474,6 +517,15 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 			"ID": "c1f6a351-fb7e-4759-81a7-04ec61b74e59",
 			"Message from FenixTestDataSyncServerObject": returnMessage.Comments,
 		}).Error("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendTestDataRows'")
+
+		return
+	} else {
+
+		fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+			"ID": "ef4afef1-6307-4f42-9623-4434040cc7da",
+			"Message from FenixTestDataSyncServer: 'returnMessage'": returnMessage,
+			"Messages Sent": len(testdataRowsMessagesStreamContainer),
+		}).Debug("Send TestDataRowMessages'")
 	}
 
 }

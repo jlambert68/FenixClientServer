@@ -13,10 +13,13 @@ import (
 )
 
 // Filter out the rows that server requested, all rows if server didn't request specific rows
-func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) filterOutRequestedTestDataRows(merklePaths []string, testDataToWorkWith *dataframe.DataFrame) {
+func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) filterOutRequestedTestDataRows(merkleTreeNodeNames []string, testDataToWorkWith *dataframe.DataFrame) {
+
+	//TODO change this to do filtering on MerkleTreeNodeNames instead of MerkleFilterPath
+	// THis is not used at the moment
 
 	// Only filter rows when there are MerklePaths to filter on
-	if len(merklePaths) == 0 {
+	if len(merkleTreeNodeNames) == 0 {
 		return
 	}
 
@@ -32,8 +35,8 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 			Comparando: -999,
 		})
 
-	// Loop all merklePaths
-	for _, merklPath := range merklePaths {
+	// Loop all merkleTreeNodeNames
+	for _, merklPath := range merkleTreeNodeNames {
 
 		// Create a temporary working copy of the testdata to work with
 		localTempTestDataCopy := testDataToWorkWith.Copy()
@@ -75,11 +78,12 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 }
 
 // Create the TestData rows to be sent to Fenix TestData Server
-func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) createRowsMessage(merklePaths []string) (testdataRowsMessages *fenixTestDataSyncServerGrpcApi.TestdataRowsMessages) {
+func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) createRowsMessage(merkleTreeNodeNames []string) (testdataRowsMessages *fenixTestDataSyncServerGrpcApi.TestdataRowsMessages) {
 
 	var testdataRows []*fenixTestDataSyncServerGrpcApi.TestDataRowMessage
 	var testDataRowMessage *fenixTestDataSyncServerGrpcApi.TestDataRowMessage
 	var testdataItemMessage *fenixTestDataSyncServerGrpcApi.TestDataItemMessage
+	var nodeNameInServersRequestedList bool
 
 	var testDataItemValueAsString string
 
@@ -166,7 +170,8 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 	}
 
 	// Filter out to only have requested rows
-	fenixClientTestDataSyncServerObject.filterOutRequestedTestDataRows(merklePaths, &df)
+	// Can't do that here because NodeName has not been added
+	//fenixClientTestDataSyncServerObject.filterOutRequestedTestDataRows(merkleTreeNodeNames, &df)
 
 	numberOfColumnsToProcess := df.Ncol()
 	numberOfRows := df.Nrow()
@@ -198,14 +203,30 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 			leafNodeName = leafNodeName + leafNodeNamePart + "/"
 		}
 
-		// Create one row object and add it to array
-		testDataRowMessage = &fenixTestDataSyncServerGrpcApi.TestDataRowMessage{
-			RowHash:       hashedRow,
-			LeafNodeName:  leafNodeName,
-			LeafNodePath:  merkleFilterPathFull,
-			TestDataItems: testdataItems,
+		// Verify that NodeName is in List from Server, when list from Server contains anny NodeNames
+		if len(merkleTreeNodeNames) > 0 {
+			nodeNameInServersRequestedList = false
+			for _, nodeName := range merkleTreeNodeNames {
+				if nodeName == leafNodeName {
+					nodeNameInServersRequestedList = true
+				}
+			}
+		} else {
+			nodeNameInServersRequestedList = true
 		}
-		testdataRows = append(testdataRows, testDataRowMessage)
+
+		// Only add testRowMessage when NodeName is requested by server
+		if nodeNameInServersRequestedList == true {
+
+			// Create one row object and add it to array
+			testDataRowMessage = &fenixTestDataSyncServerGrpcApi.TestDataRowMessage{
+				RowHash:       hashedRow,
+				LeafNodeName:  leafNodeName,
+				LeafNodePath:  merkleFilterPathFull,
+				TestDataItems: testdataItems,
+			}
+			testdataRows = append(testdataRows, testDataRowMessage)
+		}
 
 	}
 
