@@ -293,7 +293,7 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 	// Set up variables to be sent to FenixTestDataSyncServer
 	_, merkleTree, _ := common_config.LoadAndProcessFile(testFile)
 
-	f, err := os.Create("merklTreeProduced.csv")
+	f, err := os.Create("merkleTreeProduced.csv")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -463,6 +463,13 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 	// Create the message that will all messages to be in the stream
 	var testdataRowsMessagesStreamContainer []*fenixTestDataSyncServerGrpcApi.TestdataRowsMessages
 	testdataRowsMessagesStreamContainer = append(testdataRowsMessagesStreamContainer, testdataRowsMessages)
+
+	/*
+		fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+			"ID":                                  "5644eeb0-7e95-4b42-ae2a-1fafdf926f9d",
+			"testdataRowsMessagesStreamContainer": testdataRowsMessagesStreamContainer,
+		}).Debug("Sent TestDataRows")
+	*/
 
 	// Set up connection to Server
 	fenixClientTestDataSyncServerObject.SetConnectionToFenixTestDataSyncServer()

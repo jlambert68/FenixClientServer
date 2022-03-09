@@ -118,6 +118,11 @@ func (s *FenixClientTestDataGrpcServicesServer) SendTestDataRows(ctx context.Con
 		"id": "2b1c8752-eb84-4c15-b8a7-22e2464e5168",
 	}).Debug("Incoming 'SendTestDataRows'")
 
+	fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+		"id":                 "7c7cd700-953f-4e31-9ca8-e1a4262c62b8",
+		"merklePathsMessage": merklePathsMessage,
+	}).Debug("Requested TestData")
+
 	defer fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
 		"id": "755e8b4f-f184-4277-ad41-e041714c2ca8",
 	}).Debug("Outgoing 'SendTestDataRows'")

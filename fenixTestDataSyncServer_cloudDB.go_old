@@ -1,0 +1,51 @@
+package main
+
+/* START Cloud Sync
+./cloud_sql_proxy -instances=mycloud-run-project:europe-north1:fenix-sqlserver=tcp:5432
+
+*/
+
+import (
+	"github.com/sirupsen/logrus"
+)
+
+// Load TestData from CloudDB into memDB
+func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) loadNecessaryTestDataFromCloudDB() (err error) {
+
+	fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+		"id": "fec5c67e-4679-4e42-bcc4-fa64f46d3b59",
+	}).Debug("Incoming gRPC 'loadNecessaryTestDataFromCloudDB'")
+
+	defer fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+		"id": "b5410c3f-ba1b-4d77-b85a-050985ee26fd",
+	}).Debug("Outgoing gRPC 'loadNecessaryTestDataFromCloudDB'")
+
+	// Will not process anything while 'stateProcessIncomingAndOutgoingMessage' == false
+	if fenixClientTestDataSyncServerObject.stateProcessIncomingAndOutgoingMessage == false {
+		fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+			"Id": "36fa4890-69d1-4e68-940a-915fdadd7968",
+		}).Info("Will not process 'loadNecessaryTestDataFromCloudDB()' while stateProcessIncomingAndOutgoingMessage == false")
+		return nil
+	}
+
+	// All TestTDataClients in CloudDB
+	var tempCloudDBClients []cloudDBTestDataClientStruct
+	var tempCloudDBClientsMap cloudDBClientsMapType
+
+	tempCloudDBClientsMap, err = fenixClientTestDataSyncServerObject.loadAllClientsFromCloudDB(&tempCloudDBClients)
+	if err != nil {
+		fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+			"Id":    "06e04586-c8ce-4172-8391-8fdd235b15ab",
+			"error": err,
+		}).Error("Problem when executing: 'loadAllClientsFromCloudDB()'")
+
+		fenixClientTestDataSyncServerObject.stateProcessIncomingAndOutgoingMessage = false
+		return err
+	}
+
+	// Move to from temp-variables
+	cloudDBClients = tempCloudDBClients
+	cloudDBClientsMap = tempCloudDBClientsMap
+
+	return nil
+}

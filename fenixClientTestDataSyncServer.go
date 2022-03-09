@@ -1,6 +1,7 @@
 package main
 
 import (
+	fenixSyncShared "github.com/jlambert68/FenixSyncShared"
 	"github.com/sirupsen/logrus"
 )
 
@@ -26,11 +27,18 @@ func cleanup() {
 
 func FenixClientServer_main() {
 
+	// Connect to CloudDB
+	fenixSyncShared.ConnectToDB()
+
 	// Set up BackendObject
 	fenixClientTestDataSyncServerObject = &fenixClientTestDataSyncServerObject_struct{}
 
 	// Init logger
 	fenixClientTestDataSyncServerObject.InitLogger("")
+
+	// TODO Endast för Test
+	fenixClientTestDataSyncServerObject.loadAllTestDataRowItemsForClientFromCloudDB(&cloudDBTestDataRowItems)
+	fenixClientTestDataSyncServerObject.loadClientInfoFromCloudDB(&cloudDBClientInfo)
 
 	// Clean up when leaving. Is placed after logger because shutdown logs information
 	defer cleanup()
