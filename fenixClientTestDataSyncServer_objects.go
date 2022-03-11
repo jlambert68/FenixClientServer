@@ -10,7 +10,11 @@ import (
 )
 
 type fenixClientTestDataSyncServerObject_struct struct {
-	logger *logrus.Logger
+	logger                                           *logrus.Logger
+	fenixClientTestDataSyncServer_TestDataClientUuid string
+	fenixClientTestDataSyncServer_DomainUuid         string
+	fenixClientTestDataSyncServer_DomainName         string
+	merkleFilterPath                                 string
 }
 
 var fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct
@@ -40,7 +44,7 @@ type FenixClientTestDataGrpcServicesServer struct {
 
 //TODO FIXA DENNA PATH, HMMM borde köra i DB framöver
 // For now hardcoded MerklePath
-var merkleFilterPath string = "AccountEnvironment/ClientJuristictionCountryCode/MarketSubType/MarketName/" //SecurityType/"
+//var merkleFilterPath string = //"AccountEnvironment/ClientJuristictionCountryCode/MarketSubType/MarketName/" //SecurityType/"
 
 var testFile_1 = "data/FenixRawTestdata_14rows_211216.csv"
 

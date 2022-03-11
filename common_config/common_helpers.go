@@ -36,8 +36,10 @@ func CreateTestDataHeaderItemMessageHash(testDataHeaderItemMessage *fenixTestDat
 	valuesToHash = append(valuesToHash, valueToHash)
 
 	// HeaderFilterValues - An array thar is added
-	valueToHash = testDataHeaderItemMessage.HeaderLabel
-	valuesToHash = append(valuesToHash, valueToHash)
+	for _, headerFilterValue := range testDataHeaderItemMessage.HeaderFilterValues {
+		headerFilterValueToAdd := headerFilterValue.String()
+		valuesToHash = append(valuesToHash, headerFilterValueToAdd)
+	}
 
 	// Hash all values in the array
 	testDataHeaderItemMessageHash = HashValues(valuesToHash, true)

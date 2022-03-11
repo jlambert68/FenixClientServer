@@ -48,7 +48,7 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 		//	series.New(make([]bool, numberOfRows), series.Bool, "FilterColumn"))
 
 		// Extract all 'columns' from merkleFilterPath
-		merkleFilterColumns := common_config.ExtractValuesFromFilterPath(merkleFilterPath)
+		merkleFilterColumns := common_config.ExtractValuesFromFilterPath(fenixClientTestDataSyncServerObject.merkleFilterPath)
 
 		// Extract values to filter on, sent by Fenix TestData server
 		merkleFilterValues := common_config.ExtractValuesFromFilterPath(merklPath)
@@ -110,7 +110,7 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 
 	// Extract each FilterPathValues into an array
 	var merkleFilterValues []string
-	merkleFilterPathFull := "AccountEnvironment/ClientJuristictionCountryCode/MarketSubType/MarketName/" //TODO use same source
+	merkleFilterPathFull := fenixClientTestDataSyncServerObject.merkleFilterPath
 	merkleFilterPath := merkleFilterPathFull
 
 	startPosition := 0
@@ -248,7 +248,7 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 
 	// Create the message with all test data to be sent to Fenix
 	testdataRowsMessages = &fenixTestDataSyncServerGrpcApi.TestdataRowsMessages{
-		TestDataClientUuid:           common_config.FenicClientTestDataSyncServer_TestDataClientUuid,
+		TestDataClientUuid:           fenixClientTestDataSyncServerObject.fenixClientTestDataSyncServer_TestDataClientUuid,
 		TestDataHeaderLabels:         testDataHeaderLabelsMessage,
 		TestDataRows:                 testdataRows,
 		ProtoFileVersionUsedByClient: fenixTestDataSyncServerGrpcApi.CurrentFenixTestDataProtoFileVersionEnum(fenixClientTestDataSyncServerObject.getHighestFenixProtoFileVersion()),
@@ -257,3 +257,293 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 	return testdataRowsMessages
 
 }
+
+/*
+// // Convert cloudDBExposedTestDataRowItems into gRPC-RowsMessage
+func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) convertCloudDBExposedTestDataRowItemsgRpcToTestDataRowsMessage(
+	exposedTestDataRowItems []cloudDBExposedTestDataRowItemsStruct) (gRpcTestDataRowsItemMessage *fenixTestDataSyncServerGrpcApi.TestdataRowsMessages) {
+
+	fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+		"id": "bdea5110-1af8-4e2f-a78a-ed1b2ad15514",
+	}).Debug("Incoming gRPC 'convertCloudDBExposedTestDataRowItemsgRpcToTestDataRowsMessage'")
+
+	defer fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+		"id": "50c6be0a-a522-4aa6-ae7e-1db5936846f1",
+	}).Debug("Outgoing gRPC 'convertCloudDBExposedTestDataRowItemsgRpcToTestDataRowsMessage'")
+
+
+	var gRPCRowMessage fenixTestDataSyncServerGrpcApi.TestdataRowsMessages
+	var gRPCTestDataRows fenixTestDataSyncServerGrpcApi.TestdataRowsMessages
+	var gRPCTestDataHeaderLabels fenixTestDataSyncServerGrpcApi.TestDataHeaderLabelsMessage
+	var gRPCTestDataItemHeaderLabels fenixTestDataSyncServerGrpcApi.TestDataItemHeaderLabelMessage
+	var gRPCTestDataRowMessage fenixTestDataSyncServerGrpcApi.TestDataRowMessage
+	var gRPCTestDataItems fenixTestDataSyncServerGrpcApi.TestDataItemMessage
+
+	// General Message
+	gRPCRowMessage = fenixTestDataSyncServerGrpcApi.TestdataRowsMessages{
+		TestDataClientUuid:           fenixClientTestDataSyncServerObject.fenixClientTestDataSyncServer_TestDataClientUuid,
+		ProtoFileVersionUsedByClient: fenixTestDataSyncServerGrpcApi.CurrentFenixTestDataProtoFileVersionEnum(fenixClientTestDataSyncServerObject.getHighestFenixProtoFileVersion()),,
+		TestDataHeaderLabels:         nil,
+		TestDataRows:                 nil,
+	}
+
+	// Header Info
+	gRPCTestDataHeaderLabels = fenixTestDataSyncServerGrpcApi.TestDataHeaderLabelsMessage{
+		HeaderLabelsHash:         "",
+		TestDataItemHeaderLabels: nil,
+	}
+
+	gRPCTestDataItemHeaderLabels =  fenixTestDataSyncServerGrpcApi.TestDataItemHeaderLabelMessage{
+		TestDataItemHeaderLabel: "",
+	}
+
+	// TestDataRows Info
+	gRPCTestDataRowMessage = fenixTestDataSyncServerGrpcApi.TestDataRowMessage{
+		RowHash:       "",
+		LeafNodeName:  "",
+		LeafNodePath:  "",
+		TestDataItems: nil,
+	}
+
+	gRPCTestDataItems = fenixTestDataSyncServerGrpcApi.TestDataItemMessage{
+		TestDataItemValueAsString: "",
+	}
+
+
+
+	// Loop over all 'exposedTestDataRowItems' and convert into gRPC-message
+	for _, exposedTestDataRowItem := range exposedTestDataRowItems {
+		gRPCRowMessage = fenixTestDataSyncServerGrpcApi.TestdataRowsMessages{
+			TestDataClientUuid:           "",
+			ProtoFileVersionUsedByClient: fenixTestDataSyncServerGrpcApi.CurrentFenixTestDataProtoFileVersionEnum(fenixClientTestDataSyncServerObject.getHighestFenixProtoFileVersion()),
+			TestDataHeaderLabels:         nil,
+			TestDataRows:                 nil,
+		}
+	}
+
+	gRpcTestDataRowsMessage := gRpcTestDataRowsItemMessage.TestDataRows
+	// Loop over gRPC-TestDataRow-messages and convert into memoryDB-object
+	for gRpcTestDataRow, gRpcTestDataRowMessage := range gRpcTestDataRowsMessage {
+
+
+
+		// Loop over columns in 'testDataColumnsItem'
+		testDataColumnsItem := gRpcTestDataRowMessage.TestDataItems
+		for testDataColumn, columnValue := range testDataColumnsItem {
+
+			// Extract data and populate memoryDB-object
+			memDBtestDataRowItem := cloudDBTestDataRowItemCurrentStruct{
+				clientUuid:            gRpcTestDataRowsItemMessage.TestDataClientUuid,
+				rowHash:               gRpcTestDataRowMessage.RowHash,
+				testdataValueAsString: columnValue.TestDataItemValueAsString,
+				leafNodeName:          gRpcTestDataRowMessage.LeafNodeName,
+				leafNodePath:          gRpcTestDataRowMessage.LeafNodePath,
+				leafNodeHash:          "", //leafNodeHash,
+				valueColumnOrder:      testDataColumn,
+				valueRowOrder:         gRpcTestDataRow,
+				updatedTimeStamp:      "",
+			}
+
+			// Add 'memDBtestDataRowItem' to array
+			memDBtestDataRowItems = append(memDBtestDataRowItems, memDBtestDataRowItem)
+		}
+	}
+
+	return memDBtestDataRowItems
+}
+
+
+*/
+/*
+// Convert TestDataRow message into TestData dataframe object
+func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) convertCloudDBTestDataRowItemsMessageToDataFrame(cloudDBTestDataRowItems []cloudDBTestDataRowItemCurrentStruct) (testdataAsDataFrame dataframe.DataFrame, returnMessage *fenixTestDataSyncServerGrpcApi.AckNackResponse) {
+
+	fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+		"id": "4a22eea7-806f-4d50-9b2f-1d5449203db6",
+	}).Debug("Incoming gRPC 'convertCloudDBTestDataRowItemsMessageToDataFrame'")
+
+	defer fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+		"id": "9768e8b2-0c0f-41cc-90e5-3f0c17bb9ed8",
+	}).Debug("Outgoing gRPC 'convertCloudDBTestDataRowItemsMessageToDataFrame'")
+
+	testdataAsDataFrame = dataframe.New()
+
+	currentTestDataClientGuid := cloudDBTestDataRowItems[0].clientUuid
+
+	currentTestDataHeaders := fenixClientTestDataSyncServerObject.getCurrentHeadersForClient(currentTestDataClientGuid)
+
+	// If there are no headers in Database then Ask client for HeaderHash
+	if len(currentTestDataHeaders) == 0 {
+		fenixTestDataSyncServerObject.AskClientToSendTestDataHeaderHash(currentTestDataClientGuid)
+		currentTestDataHeaders = fenixTestDataSyncServerObject.getCurrentHeadersForClient(currentTestDataClientGuid)
+
+		// Validate that we got hte TestData Headers
+		if len(currentTestDataHeaders) == 0 {
+
+			// Set Error codes to return message
+			var errorCodes []fenixTestDataSyncServerGrpcApi.ErrorCodesEnum
+			var errorCode fenixTestDataSyncServerGrpcApi.ErrorCodesEnum
+
+			errorCode = fenixTestDataSyncServerGrpcApi.ErrorCodesEnum_ERROR_UNKNOWN_CALLER //TODO Change to correct error
+			errorCodes = append(errorCodes, errorCode)
+
+			// Create Return message
+			returnMessage = &fenixTestDataSyncServerGrpcApi.AckNackResponse{
+				AckNack:    false,
+				Comments:   "Fenix Asked for TestDataHeaders but didn't receive them i a correct way",
+				ErrorCodes: errorCodes,
+			}
+
+			fenixTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+				"Id": "b20fb287-2e60-4f6f-b635-fea49f367a67",
+			}).Info("Fenix Asked for TestDataHeaders but didn't receive them i a correct way")
+
+			// leave
+			return testdataAsDataFrame, returnMessage
+		}
+	}
+
+	// Add 'KEY' to all headers
+	var testDataHeadersInDataFrame []string
+	testDataHeadersInDataFrame = append(testDataHeadersInDataFrame, currentTestDataHeaders...)
+	testDataHeadersInDataFrame = append(testDataHeadersInDataFrame, "TestDataHash")
+
+	//testDataRows := testdataRowsMessages.TestDataRows
+	// Create matrix for testdata
+	dataMatrix := make(map[int]map[int]string) //make(map[<row>>]map[<column>]<value>
+
+	// Create a map for RowHashes
+	testDataRowHashes := make(map[int]string) //make(map[<row>>]<rowHash>
+
+	// Loop over all 'cloudDBTestDataRowItems' and add to matriix
+	for _, cloudDBTestDataRowItem := range cloudDBTestDataRowItems {
+
+		// Verify that datapoint doesn't exist
+		_, dataPointExists := dataMatrix[cloudDBTestDataRowItem.valueRowOrder][cloudDBTestDataRowItem.valueColumnOrder]
+		if dataPointExists == true {
+			fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+				"Id":                                   "efa873d1-b023-48db-b948-67fe00e103d7",
+				"cloudDBTestDataRowItem.valueRowOrder": cloudDBTestDataRowItem.valueRowOrder,
+				"cloudDBTestDataRowItem.valueColumnOrder": cloudDBTestDataRowItem.valueRowOrder,
+			}).Fatal("Datapoint should only appears once")
+		}
+
+		// Add data to matrix
+		// If 'row-map" already doesn't exist then initiate it
+		_, rowExists := dataMatrix[cloudDBTestDataRowItem.valueRowOrder]
+		if rowExists == false {
+			// Initiate row in map and add column value
+			dataMatrix[cloudDBTestDataRowItem.valueRowOrder] = map[int]string{}
+			dataMatrix[cloudDBTestDataRowItem.valueRowOrder][cloudDBTestDataRowItem.valueColumnOrder] = cloudDBTestDataRowItem.testdataValueAsString
+		} else {
+			// Row exists then just add column value
+			dataMatrix[cloudDBTestDataRowItem.valueRowOrder][cloudDBTestDataRowItem.valueColumnOrder] = cloudDBTestDataRowItem.testdataValueAsString
+		}
+
+		// Only add RowHash if it not exists
+		_, rowHashExists := testDataRowHashes[cloudDBTestDataRowItem.valueRowOrder]
+		if rowHashExists == false {
+			testDataRowHashes[cloudDBTestDataRowItem.valueRowOrder] = cloudDBTestDataRowItem.rowHash
+		}
+	}
+
+	// Loop all MerkleTreeNodes and create a DataFrame for the data
+	numberOfRowsInMatrix := len(dataMatrix)
+	var numberOfColumnsInMatrixRow int
+	var numberOfColumnInFirstMatrixRow int
+
+	for testDataRowCounter := 0; testDataRowCounter < numberOfRowsInMatrix; testDataRowCounter++ {
+
+		// Extract row
+		testDataRow := dataMatrix[testDataRowCounter]
+
+		// Create one row, as a dataframe
+		rowDataframe := dataframe.New()
+		var valuesToHash []string
+
+		// Get the number of columns in row
+		numberOfColumnsInMatrixRow = len(testDataRow)
+
+		// Verify that all rows have the same number of columns
+		if testDataRowCounter == 0 {
+			numberOfColumnInFirstMatrixRow = numberOfColumnsInMatrixRow
+
+		} else {
+
+			if numberOfColumnsInMatrixRow != numberOfColumnInFirstMatrixRow {
+				fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+					"Id":                             "a2043be7-657a-4c94-a1a0-374243e82571",
+					"numberOfColumnInFirstMatrixRow": numberOfColumnInFirstMatrixRow,
+					"numberOfColumnsInMatrixRow":     numberOfColumnsInMatrixRow,
+				}).Fatal("It seems that all TestDataRows doesn't have the same number o columns")
+			}
+		}
+
+		// Loop over columns
+		for testDataColumnCounter := 0; testDataColumnCounter < numberOfColumnsInMatrixRow; testDataColumnCounter++ {
+			//		for testDataItemCounter, testDataItem := range testDataRow {
+
+			if rowDataframe.Nrow() == 0 {
+				// Create New
+				rowDataframe = dataframe.New(
+					series.New([]string{testDataRow[testDataColumnCounter]}, series.String, currentTestDataHeaders[testDataColumnCounter]))
+			} else {
+				// Add to existing
+				rowDataframe = rowDataframe.Mutate(
+					series.New([]string{testDataRow[testDataColumnCounter]}, series.String, currentTestDataHeaders[testDataColumnCounter]))
+			}
+
+			valuesToHash = append(valuesToHash, testDataRow[testDataColumnCounter])
+		}
+
+		// Create and add column for 'TestDataHash'
+		testDataHashSeriesColumn := series.New([]string{"key"}, series.String, "TestDataHash")
+		rowDataframe = rowDataframe.Mutate(testDataHashSeriesColumn)
+
+		// Hash all values for row
+		hashedRow := fenixSyncShared.HashValues(valuesToHash, true)
+
+		// Validate that Row-hash is correct calculated
+		if hashedRow != testDataRowHashes[testDataRowCounter] {
+
+			// Set Error codes to return message
+			var errorCodes []fenixTestDataSyncServerGrpcApi.ErrorCodesEnum
+			var errorCode fenixTestDataSyncServerGrpcApi.ErrorCodesEnum
+
+			errorCode = fenixTestDataSyncServerGrpcApi.ErrorCodesEnum_ERROR_ROWHASH_NOT_CORRECT_CALCULATED
+			errorCodes = append(errorCodes, errorCode)
+
+			// Create Return message
+			returnMessage = &fenixTestDataSyncServerGrpcApi.AckNackResponse{
+				AckNack:    false,
+				Comments:   "RowsHashes seems not to be correct calculated.",
+				ErrorCodes: errorCodes,
+			}
+
+			fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+				"Id": "9e591230-1100-4771-ae38-c98a71daf784",
+			}).Info("RowsHashes seems not to be correct calculated.")
+
+			// Exit function Respond back to client when hash error
+			return testdataAsDataFrame, returnMessage
+		}
+
+		// Add TestDataHash to row DataFrame
+		rowDataframe.Elem(0, rowDataframe.Ncol()-1).Set(hashedRow)
+		//) Mutate(
+		//	series.New([]string{hashedRow}, series.String, "TestDataHash"))
+
+		// Add the row to the Dataframe for the testdata
+		// Special handling first when first time
+		if testdataAsDataFrame.Nrow() == 0 {
+			testdataAsDataFrame = rowDataframe.Copy()
+
+		} else {
+			testdataAsDataFrame = testdataAsDataFrame.OuterJoin(rowDataframe, testDataHeadersInDataFrame...)
+		}
+	}
+
+	return testdataAsDataFrame, nil
+
+}
+*/

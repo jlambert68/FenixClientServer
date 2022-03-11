@@ -6,7 +6,7 @@ import (
 )
 
 // Used for only process cleanup once
-var cleanupProcessed bool = false
+var cleanupProcessed = false
 
 func cleanup() {
 
@@ -25,20 +25,24 @@ func cleanup() {
 	}
 }
 
-func FenixClientServer_main() {
+func FenixClientServerMain() {
 
 	// Connect to CloudDB
 	fenixSyncShared.ConnectToDB()
 
 	// Set up BackendObject
-	fenixClientTestDataSyncServerObject = &fenixClientTestDataSyncServerObject_struct{}
+	fenixClientTestDataSyncServerObject = &fenixClientTestDataSyncServerObject_struct{
+		fenixClientTestDataSyncServer_TestDataClientUuid: fenixSyncShared.MustGetEnvironmentVariable("TestDataClientUuid"),
+		fenixClientTestDataSyncServer_DomainUuid:         fenixSyncShared.MustGetEnvironmentVariable("TestDomainUuid"),
+		fenixClientTestDataSyncServer_DomainName:         fenixSyncShared.MustGetEnvironmentVariable("TestDomainName"),
+		merkleFilterPath:                                 fenixSyncShared.MustGetEnvironmentVariable("MerkleFilterPath"), //TODO Remove all references to HARDCODED merkleFilterPath
+	}
 
 	// Init logger
 	fenixClientTestDataSyncServerObject.InitLogger("")
 
 	// TODO Endast för Test
-	fenixClientTestDataSyncServerObject.loadAllTestDataRowItemsForClientFromCloudDB(&cloudDBTestDataRowItems)
-	fenixClientTestDataSyncServerObject.loadClientInfoFromCloudDB(&cloudDBClientInfo)
+	fenixClientTestDataSyncServerObject.loadAllTestDataRowItemsForClientFromCloudDB(&cloudDBExposedTestDataRowItems)
 
 	// Clean up when leaving. Is placed after logger because shutdown logs information
 	defer cleanup()

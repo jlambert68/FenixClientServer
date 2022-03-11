@@ -30,3 +30,15 @@ type cloudDBClientInfoStruct struct {
 	domain_name                   string
 	domain_uuid                   string
 }
+
+// Exposed TestData for Client
+var cloudDBExposedTestDataRowItems []cloudDBExposedTestDataRowItemsStruct
+
+type cloudDBExposedTestDataRowItemsStruct struct {
+	rowHash                string
+	testdataValueAsString  string
+	merkleTreeLeafNodeName string
+	valueColumnOrder       int
+	valueRowOrder          int
+	updatedTimeStamp       string
+}

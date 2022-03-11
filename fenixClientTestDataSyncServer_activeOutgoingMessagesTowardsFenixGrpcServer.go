@@ -186,7 +186,7 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 
 	// Header message to be set to  TestDataSyncServer
 	testDataHeaderMessage := &fenixTestDataSyncServerGrpcApi.TestDataHeadersMessage{
-		TestDataClientUuid:      common_config.FenicClientTestDataSyncServer_TestDataClientUuid,
+		TestDataClientUuid:      fenixClientTestDataSyncServerObject.fenixClientTestDataSyncServer_TestDataClientUuid,
 		TestDataHeaderItemsHash: testDataHeaderItemMessageHash,
 		TestDataHeaderItems:     testDataHeaderItemsMessage,
 		ProtoFileVersionUsedByClient: fenixTestDataSyncServerGrpcApi.CurrentFenixTestDataProtoFileVersionEnum(
@@ -204,9 +204,9 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 
 	// Set up variables to be sent to FenixTestDataSyncServer
 	TestDataClientInformationMessage := fenixTestDataSyncServerGrpcApi.TestDataClientInformationMessage{
-		TestDataClientUuid:           common_config.FenicClientTestDataSyncServer_TestDataClientUuid,
-		TestDomainUuid:               common_config.FenicClientTestDataSyncServer_DomainUuid,
-		TestDomainName:               common_config.FenicClientTestDataSyncServer_DomainName,
+		TestDataClientUuid:           fenixClientTestDataSyncServerObject.fenixClientTestDataSyncServer_TestDataClientUuid,
+		TestDomainUuid:               fenixClientTestDataSyncServerObject.fenixClientTestDataSyncServer_DomainUuid,
+		TestDomainName:               fenixClientTestDataSyncServerObject.fenixClientTestDataSyncServer_DomainName,
 		TestDataClientIpAddress:      common_config.ClientTestDataSyncServerAddress,
 		TestDataClientPort:           string(rune(common_config.ClientTestDataSyncServerPort)),
 		ProtoFileVersionUsedByClient: fenixTestDataSyncServerGrpcApi.CurrentFenixTestDataProtoFileVersionEnum(fenixClientTestDataSyncServerObject.getHighestFenixProtoFileVersion()),
@@ -242,13 +242,13 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) SendMerkleHash() {
 
 	merkleRootHash, _, _ := common_config.LoadAndProcessFile(testFile)
-	merkleFilterPathHash := common_config.HashSingleValue(merkleFilterPath)
+	merkleFilterPathHash := common_config.HashSingleValue(fenixClientTestDataSyncServerObject.merkleFilterPath)
 
 	// Set up variables to be sent to FenixTestDataSyncServer
 	merkleHashMessage := fenixTestDataSyncServerGrpcApi.MerkleHashMessage{
-		TestDataClientUuid: common_config.FenicClientTestDataSyncServer_TestDataClientUuid,
+		TestDataClientUuid: fenixClientTestDataSyncServerObject.fenixClientTestDataSyncServer_TestDataClientUuid,
 		MerkleHash:         merkleRootHash,
-		MerkleFilter:       merkleFilterPath,
+		MerkleFilter:       fenixClientTestDataSyncServerObject.merkleFilterPath,
 		MerkleFilterHash:   merkleFilterPathHash,
 		ProtoFileVersionUsedByClient: fenixTestDataSyncServerGrpcApi.CurrentFenixTestDataProtoFileVersionEnum(
 			fenixClientTestDataSyncServerObject.getHighestFenixProtoFileVersion()),
@@ -315,7 +315,7 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 		merkleTreeNodeMessages = append(merkleTreeNodeMessages, merkleTreeNodeMessage)
 	}
 	merkleTreeMessage := &fenixTestDataSyncServerGrpcApi.MerkleTreeMessage{
-		TestDataClientUuid: common_config.FenicClientTestDataSyncServer_TestDataClientUuid,
+		TestDataClientUuid: fenixClientTestDataSyncServerObject.fenixClientTestDataSyncServer_TestDataClientUuid,
 		MerkleTreeNodes:    merkleTreeNodeMessages,
 		ProtoFileVersionUsedByClient: fenixTestDataSyncServerGrpcApi.CurrentFenixTestDataProtoFileVersionEnum(
 			fenixClientTestDataSyncServerObject.getHighestFenixProtoFileVersion()),
@@ -389,7 +389,7 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 
 	// HeaderHash message to be set to TestDataSyncServer
 	testDataHeaderMessage := &fenixTestDataSyncServerGrpcApi.TestDataHeaderHashMessage{
-		TestDataClientUuid:      common_config.FenicClientTestDataSyncServer_TestDataClientUuid,
+		TestDataClientUuid:      fenixClientTestDataSyncServerObject.fenixClientTestDataSyncServer_TestDataClientUuid,
 		TestDataHeaderItemsHash: testDataHeaderItemMessageHash,
 		ProtoFileVersionUsedByClient: fenixTestDataSyncServerGrpcApi.CurrentFenixTestDataProtoFileVersionEnum(
 			fenixClientTestDataSyncServerObject.getHighestFenixProtoFileVersion()),
