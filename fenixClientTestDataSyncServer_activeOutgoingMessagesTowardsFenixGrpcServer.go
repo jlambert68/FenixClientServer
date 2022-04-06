@@ -8,10 +8,13 @@ import (
 	fenixTestDataSyncServerGrpcApi "github.com/jlambert68/FenixGrpcApi/Fenix/fenixTestDataSyncServerGrpcApi/go_grpc_api"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
+	"google.golang.org/api/idtoken"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	grpcMetadata "google.golang.org/grpc/metadata"
 	"log"
 	"os"
+	"time"
 )
 
 // ********************************************************************************************************************
@@ -44,12 +47,14 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 	}
 	if err != nil {
 		fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+			"ID": "50b59b1b-57ce-4c27-aa84-617f0cde3100",
 			"fenixTestDataSyncServer_address_to_dial": fenixTestDataSyncServer_address_to_dial,
 			"error message": err,
 		}).Error("Did not connect to FenixTestDataSyncServer via gRPC")
 		//os.Exit(0)
 	} else {
 		fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+			"ID": "0c650bbc-45d0-4029-bd25-4ced9925a059",
 			"fenixTestDataSyncServer_address_to_dial": fenixTestDataSyncServer_address_to_dial,
 		}).Info("gRPC connection OK to FenixTestDataSyncServer")
 
@@ -552,7 +557,40 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 	}
 
 	// Do gRPC-call
-	ctx := context.Background()
+	//ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	// Only add access token when run on GCP
+	if common_config.ExecutionLocationForFenixTestDataServer == common_config.GCP {
+
+		// Create an identity token.
+		// With a global TokenSource tokens would be reused and auto-refreshed at need.
+		// A given TokenSource is specific to the audience.
+		tokenSource, err := idtoken.NewTokenSource(ctx, common_config.FenixTestDataSyncServerAddress)
+		if err != nil {
+			fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+				"ID":  "8ba622d8-b4cd-46c7-9f81-d9ade2568eca",
+				"err": err,
+			}).Error("Couldn't generate access token")
+
+			return false, "Couldn't generate access token"
+		}
+
+		token, err := tokenSource.Token()
+		if err != nil {
+			fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+				"ID":  "0cf31da5-9e6b-41bc-96f1-6b78fb446194",
+				"err": err,
+			}).Error("Problem getting the token")
+
+			return false, "Problem getting the token"
+		}
+
+		// Add token to gRPC Request.
+		ctx = grpcMetadata.AppendToOutgoingContext(ctx, "authorization", "Bearer "+token.AccessToken)
+	}
+
 	returnMessage, err := fenixTestDataSyncServerClient.AreYouAlive(ctx, emptyParameter)
 
 	// Shouldn't happen
@@ -560,14 +598,14 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 		fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
 			"ID":    "818aaf0b-4112-4be4-97b9-21cc084c7b8b",
 			"error": err,
-		}).Error("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendTestDataRows'")
+		}).Error("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendAreYouAliveToFenixTestDataServer'")
 
 	} else if returnMessage.AckNack == false {
 		// FenixTestDataSyncServer couldn't handle gPRC call
 		fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
 			"ID": "2ecbc800-2fb6-4e88-858d-a421b61c5529",
 			"Message from FenixTestDataSyncServerObject": returnMessage.Comments,
-		}).Error("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendTestDataRows'")
+		}).Error("Problem to do gRPC-call to FenixTestDataSyncServer for 'SendAreYouAliveToFenixTestDataServer'")
 	}
 
 	return returnMessage.AckNack, returnMessage.Comments
