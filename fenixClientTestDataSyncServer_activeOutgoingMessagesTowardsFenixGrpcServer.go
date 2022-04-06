@@ -572,7 +572,7 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 		// Create an identity token.
 		// With a global TokenSource tokens would be reused and auto-refreshed at need.
 		// A given TokenSource is specific to the audience.
-		tokenSource, err := idtoken.NewTokenSource(ctx, common_config.ClientTestDataSyncServerAddress)
+		tokenSource, err := idtoken.NewTokenSource(ctx, common_config.ClientTestDataSyncServerAddress+":443")
 		if err != nil {
 			fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
 				"ID":  "8ba622d8-b4cd-46c7-9f81-d9ade2568eca",
