@@ -585,6 +585,11 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 			}).Error("Problem getting the token")
 
 			return false, "Problem getting the token"
+		} else {
+			fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+				"ID":    "8b1ca089-0797-4ee6-bf9d-f9b06f606ae9",
+				"token": token,
+			}).Error("Got Bearer Token")
 		}
 
 		// Add token to gRPC Request.
