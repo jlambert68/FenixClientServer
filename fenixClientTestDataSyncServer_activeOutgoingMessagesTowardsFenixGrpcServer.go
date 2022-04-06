@@ -559,7 +559,12 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 	// Do gRPC-call
 	//ctx := context.Background()
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
+	defer func() {
+		fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+			"ID": "baee9a42-2f70-4977-8c35-f5f7850bbd3a",
+		}).Error("Running Defer Cancel function")
+		cancel()
+	}()
 
 	// Only add access token when run on GCP
 	if common_config.ExecutionLocationForFenixTestDataServer == common_config.GCP {
@@ -567,7 +572,7 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 		// Create an identity token.
 		// With a global TokenSource tokens would be reused and auto-refreshed at need.
 		// A given TokenSource is specific to the audience.
-		tokenSource, err := idtoken.NewTokenSource(ctx, common_config.FenixTestDataSyncServerAddress)
+		tokenSource, err := idtoken.NewTokenSource(ctx, common_config.ClientTestDataSyncServerAddress)
 		if err != nil {
 			fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
 				"ID":  "8ba622d8-b4cd-46c7-9f81-d9ade2568eca",
