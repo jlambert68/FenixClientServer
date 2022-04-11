@@ -590,6 +590,11 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 
 	}
 
+	fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+		"ID": "cd124ca3-87bb-431b-9e7f-e044c52b4960",
+		"fenixClientTestDataSyncServerObject.gcpAccessToken": fenixClientTestDataSyncServerObject.gcpAccessToken,
+	}).Debug("Will use Bearer Token")
+
 	// Add token to gRPC Request.
 	appendedCtx = grpcMetadata.AppendToOutgoingContext(ctx, "authorization", "Bearer "+fenixClientTestDataSyncServerObject.gcpAccessToken.AccessToken)
 
