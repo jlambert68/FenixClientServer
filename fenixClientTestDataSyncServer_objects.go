@@ -4,6 +4,7 @@ import (
 	fenixClientTestDataSyncServerGrpcApi "github.com/jlambert68/FenixGrpcApi/Client/fenixClientTestDataSyncServerGrpcApi/go_grpc_api"
 	fenixTestDataSyncServerGrpcApi "github.com/jlambert68/FenixGrpcApi/Fenix/fenixTestDataSyncServerGrpcApi/go_grpc_api"
 	"github.com/sirupsen/logrus"
+	"golang.org/x/oauth2"
 	"google.golang.org/grpc"
 	"net"
 	//	ecpb "github.com/jlambert68/FenixGrpcApi/Client/fenixTestDataSyncServerGrpcApi/echo/go_grpc_api"
@@ -15,6 +16,7 @@ type fenixClientTestDataSyncServerObject_struct struct {
 	fenixClientTestDataSyncServer_DomainUuid         string
 	fenixClientTestDataSyncServer_DomainName         string
 	merkleFilterPath                                 string
+	gcpAccessToken                                   *oauth2.Token
 }
 
 var fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct

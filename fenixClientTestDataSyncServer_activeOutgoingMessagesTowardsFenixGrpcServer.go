@@ -8,10 +8,8 @@ import (
 	fenixTestDataSyncServerGrpcApi "github.com/jlambert68/FenixGrpcApi/Fenix/fenixTestDataSyncServerGrpcApi/go_grpc_api"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
-	"google.golang.org/api/idtoken"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
-	grpcMetadata "google.golang.org/grpc/metadata"
 	"log"
 	"os"
 	"time"
@@ -207,6 +205,9 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 // RegisterTestDataClient  - Register the client at Fenix by calling Fenix's gPRC server
 func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) RegisterTestDataClient() {
 
+	var ctx context.Context
+	var returnMessageAckNack bool
+
 	// Set up variables to be sent to FenixTestDataSyncServer
 	TestDataClientInformationMessage := fenixTestDataSyncServerGrpcApi.TestDataClientInformationMessage{
 		TestDataClientUuid:           fenixClientTestDataSyncServerObject.fenixClientTestDataSyncServer_TestDataClientUuid,
@@ -221,7 +222,25 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 	fenixClientTestDataSyncServerObject.SetConnectionToFenixTestDataSyncServer()
 
 	// Do gRPC-call
-	ctx := context.Background()
+	//ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer func() {
+		fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+			"ID": "baee9a42-2f70-4977-8c35-f5f7850bbd3a",
+		}).Error("Running Defer Cancel function")
+		cancel()
+	}()
+
+	// Only add access token when run on GCP
+	if common_config.ExecutionLocationForFenixTestDataServer == common_config.GCP {
+
+		// Add Access token
+		ctx, returnMessageAckNack, _ = fenixClientTestDataSyncServerObject.generateGCPAccessToken(ctx)
+		if returnMessageAckNack == false {
+			return
+		}
+
+	}
 	returnMessage, err := fenixTestDataSyncServerClient.RegisterTestDataClient(ctx, &TestDataClientInformationMessage)
 
 	// Shouldn't happen
@@ -246,6 +265,9 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 // SendMerkleHash - Send the client's MerkleHash to Fenix by calling Fenix's gPRC server
 func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) SendMerkleHash() {
 
+	var ctx context.Context
+	var returnMessageAckNack bool
+
 	merkleRootHash, _, _ := common_config.LoadAndProcessFile(testFile)
 	merkleFilterPathHash := common_config.HashSingleValue(fenixClientTestDataSyncServerObject.merkleFilterPath)
 
@@ -263,7 +285,25 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 	fenixClientTestDataSyncServerObject.SetConnectionToFenixTestDataSyncServer()
 
 	// Do gRPC-call
-	ctx := context.Background()
+	//ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer func() {
+		fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+			"ID": "baee9a42-2f70-4977-8c35-f5f7850bbd3a",
+		}).Error("Running Defer Cancel function")
+		cancel()
+	}()
+
+	// Only add access token when run on GCP
+	if common_config.ExecutionLocationForFenixTestDataServer == common_config.GCP {
+
+		// Add Access token
+		ctx, returnMessageAckNack, _ = fenixClientTestDataSyncServerObject.generateGCPAccessToken(ctx)
+		if returnMessageAckNack == false {
+			return
+		}
+	}
+
 	returnMessage, err := fenixTestDataSyncServerClient.SendMerkleHash(ctx, &merkleHashMessage)
 
 	// Shouldn't happen
@@ -292,6 +332,9 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 
 // SendMerkleTree - Send the client's MerkleTree to Fenix by calling Fenix's gPRC server
 func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) SendMerkleTree() {
+
+	var ctx context.Context
+	var returnMessageAckNack bool
 
 	var merkleTreeNodeMessages []*fenixTestDataSyncServerGrpcApi.MerkleTreeNodeMessage
 
@@ -330,7 +373,26 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 	fenixClientTestDataSyncServerObject.SetConnectionToFenixTestDataSyncServer()
 
 	// Do gRPC-call
-	ctx := context.Background()
+	//ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer func() {
+		fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+			"ID": "baee9a42-2f70-4977-8c35-f5f7850bbd3a",
+		}).Error("Running Defer Cancel function")
+		cancel()
+	}()
+
+	// Only add access token when run on GCP
+	if common_config.ExecutionLocationForFenixTestDataServer == common_config.GCP {
+
+		// Add Access token
+		ctx, returnMessageAckNack, _ = fenixClientTestDataSyncServerObject.generateGCPAccessToken(ctx)
+		if returnMessageAckNack == false {
+			return
+		}
+
+	}
+
 	returnMessage, err := fenixTestDataSyncServerClient.SendMerkleTree(ctx, merkleTreeMessage)
 
 	// Shouldn't happen
@@ -354,6 +416,9 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 
 // SendTestDataHeaderHash - Send the client's TestDataHeaderHash to Fenix by calling Fenix's gPRC server
 func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) SendTestDataHeaderHash() {
+
+	var ctx context.Context
+	var returnMessageAckNack bool
 
 	var testDataHeaderItemMessage *fenixTestDataSyncServerGrpcApi.TestDataHeaderItemMessage
 	var testDataHeaderItemsMessage []*fenixTestDataSyncServerGrpcApi.TestDataHeaderItemMessage
@@ -404,7 +469,26 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 	fenixClientTestDataSyncServerObject.SetConnectionToFenixTestDataSyncServer()
 
 	// Do gRPC-call
-	ctx := context.Background()
+	//ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer func() {
+		fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+			"ID": "baee9a42-2f70-4977-8c35-f5f7850bbd3a",
+		}).Error("Running Defer Cancel function")
+		cancel()
+	}()
+
+	// Only add access token when run on GCP
+	if common_config.ExecutionLocationForFenixTestDataServer == common_config.GCP {
+
+		// Add Access token
+		ctx, returnMessageAckNack, _ = fenixClientTestDataSyncServerObject.generateGCPAccessToken(ctx)
+		if returnMessageAckNack == false {
+			return
+		}
+
+	}
+
 	returnMessage, err := fenixTestDataSyncServerClient.SendTestDataHeaderHash(ctx, testDataHeaderMessage)
 
 	// Shouldn't happen
@@ -429,6 +513,9 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 // SendTestDataHeaders - Send the client's TestDataHeaders to Fenix by calling Fenix's gPRC server
 func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) SendTestDataHeaders() {
 
+	var ctx context.Context
+	var returnMessageAckNack bool
+
 	// Header message to be sent to  TestDataSyncServer
 	testDataHeaderMessage := fenixClientTestDataSyncServerObject.createTestDataHeaderMessage()
 
@@ -436,7 +523,26 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 	fenixClientTestDataSyncServerObject.SetConnectionToFenixTestDataSyncServer()
 
 	// Do gRPC-call
-	ctx := context.Background()
+	//ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer func() {
+		fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+			"ID": "baee9a42-2f70-4977-8c35-f5f7850bbd3a",
+		}).Error("Running Defer Cancel function")
+		cancel()
+	}()
+
+	// Only add access token when run on GCP
+	if common_config.ExecutionLocationForFenixTestDataServer == common_config.GCP {
+
+		// Add Access token
+		ctx, returnMessageAckNack, _ = fenixClientTestDataSyncServerObject.generateGCPAccessToken(ctx)
+		if returnMessageAckNack == false {
+			return
+		}
+
+	}
+
 	returnMessage, err := fenixTestDataSyncServerClient.SendTestDataHeaders(ctx, testDataHeaderMessage)
 
 	// Shouldn't happen
@@ -462,6 +568,9 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 // SendTestDataRows - Send the client's TestDataRow to Fenix by calling Fenix's gPRC server
 func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) SendTestDataRows(merkleNodeNames []string) {
 
+	var ctx context.Context
+	var returnMessageAckNack bool
+
 	// Create the message with all test data to be sent to Fenix
 	testdataRowsMessages := fenixClientTestDataSyncServerObject.createRowsMessage(merkleNodeNames)
 
@@ -480,7 +589,26 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 	fenixClientTestDataSyncServerObject.SetConnectionToFenixTestDataSyncServer()
 
 	// Set up Stream towards the gRPC-server
-	ctx := context.Background()
+	//ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer func() {
+		fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
+			"ID": "baee9a42-2f70-4977-8c35-f5f7850bbd3a",
+		}).Error("Running Defer Cancel function")
+		cancel()
+	}()
+
+	// Only add access token when run on GCP
+	if common_config.ExecutionLocationForFenixTestDataServer == common_config.GCP {
+
+		// Add Access token
+		ctx, returnMessageAckNack, _ = fenixClientTestDataSyncServerObject.generateGCPAccessToken(ctx)
+		if returnMessageAckNack == false {
+			return
+		}
+
+	}
+
 	//ctx2, _ := context.WithCancel(ctx)
 	//defer cancel()
 	stream, err := fenixTestDataSyncServerClient.SendTestDataRows(ctx)
@@ -547,6 +675,10 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 // SendAreYouAliveToFenixTestDataServer - Send the client's TestDataHeaders to Fenix by calling Fenix's gPRC server
 func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_struct) SendAreYouAliveToFenixTestDataServer() (bool, string) {
 
+	var ctx context.Context
+	var returnMessageAckNack bool
+	var returnMessageString string
+
 	// Set up connection to Server
 	fenixClientTestDataSyncServerObject.SetConnectionToFenixTestDataSyncServer()
 
@@ -569,36 +701,12 @@ func (fenixClientTestDataSyncServerObject *fenixClientTestDataSyncServerObject_s
 	// Only add access token when run on GCP
 	if common_config.ExecutionLocationForFenixTestDataServer == common_config.GCP {
 
-		// Create an identity token.
-		// With a global TokenSource tokens would be reused and auto-refreshed at need.
-		// A given TokenSource is specific to the audience.
-		tokenSource, err := idtoken.NewTokenSource(ctx, "https://"+common_config.FenixTestDataSyncServerAddress)
-		if err != nil {
-			fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
-				"ID":  "8ba622d8-b4cd-46c7-9f81-d9ade2568eca",
-				"err": err,
-			}).Error("Couldn't generate access token")
-
-			return false, "Couldn't generate access token"
+		// Add Access token
+		ctx, returnMessageAckNack, returnMessageString = fenixClientTestDataSyncServerObject.generateGCPAccessToken(ctx)
+		if returnMessageAckNack == false {
+			return false, returnMessageString
 		}
 
-		token, err := tokenSource.Token()
-		if err != nil {
-			fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
-				"ID":  "0cf31da5-9e6b-41bc-96f1-6b78fb446194",
-				"err": err,
-			}).Error("Problem getting the token")
-
-			return false, "Problem getting the token"
-		} else {
-			fenixClientTestDataSyncServerObject.logger.WithFields(logrus.Fields{
-				"ID":    "8b1ca089-0797-4ee6-bf9d-f9b06f606ae9",
-				"token": token,
-			}).Debug("Got Bearer Token")
-		}
-
-		// Add token to gRPC Request.
-		ctx = grpcMetadata.AppendToOutgoingContext(ctx, "authorization", "Bearer "+token.AccessToken)
 	}
 
 	returnMessage, err := fenixTestDataSyncServerClient.AreYouAlive(ctx, emptyParameter)
