@@ -1,8 +1,13 @@
 package main
 
 import (
+	"crypto/tls"
+	"flag"
+	"fmt"
 	fenixSyncShared "github.com/jlambert68/FenixSyncShared"
 	"github.com/sirupsen/logrus"
+	"log"
+	"net/http"
 )
 
 // Used for only process cleanup once
@@ -64,6 +69,36 @@ func FenixClientServerMain() {
 
 		}()
 	*/
+
+	// TODO remove only for testing https connection between Cloud Run containers at SEB-network
+	go func() {
+		addr := flag.String("addr", ":4000", "HTTPS network address")
+		certFile := flag.String("certfile", "server.crt", "certificate PEM file")
+		keyFile := flag.String("keyfile", "server.key", "key PEM file")
+		flag.Parse()
+
+		mux := http.NewServeMux()
+		mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
+			if req.URL.Path != "/" {
+				http.NotFound(w, req)
+				return
+			}
+			fmt.Fprintf(w, "Proudly served, from GCP, with Go and HTTPS!")
+		})
+
+		srv := &http.Server{
+			Addr:    *addr,
+			Handler: mux,
+			TLSConfig: &tls.Config{
+				MinVersion:               tls.VersionTLS13,
+				PreferServerCipherSuites: true,
+			},
+		}
+
+		log.Printf("Starting server on %s", *addr)
+		err := srv.ListenAndServeTLS(*certFile, *keyFile)
+		log.Fatal(err)
+	}()
 
 	// Start Backend gRPC-server
 	fenixClientTestDataSyncServerObject.InitGrpcServer()

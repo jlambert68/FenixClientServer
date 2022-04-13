@@ -14,7 +14,7 @@ RUN go build -o /fenixClientServer .
 FROM debian:buster
 #FROM golang:1.13.8
 
-EXPOSE 5998
+EXPOSE 5998 4000
 #FROM golang:1.13.8
 WORKDIR /
 COPY --from=build-env /fenixClientServer /
